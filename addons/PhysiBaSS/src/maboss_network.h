@@ -12,7 +12,7 @@
  */
 
 #include "MaBEstEngine.h"
-#include "../base/readXML.h"
+#include "readXML.h"
 
 class MaBossNetwork
 {

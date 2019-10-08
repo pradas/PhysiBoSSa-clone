@@ -1,5 +1,5 @@
 #include "maboss_network.h"
-#include "../base/utilities.h"
+#include "utilities.h"
 
 /* Default constructor */
 MaBossNetwork::MaBossNetwork()
