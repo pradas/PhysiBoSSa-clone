@@ -1,0 +1,20 @@
+package:
+  name: maboss
+  version: "2.2.2"
+
+source:
+  git_url: https://github.com/maboss-bkmc/MaBoSS-env-2.0.git
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - flex
+    - bison
+    - make
+
+about:
+  home:  https://maboss.curie.fr
+
