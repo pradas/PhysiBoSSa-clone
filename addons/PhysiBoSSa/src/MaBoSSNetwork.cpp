@@ -1,8 +1,8 @@
 #include "maboss_network.h"
-#include "utilities.h"
+#include "utils.h"
 
 /* Default constructor */
-MaBossNetwork::MaBossNetwork()
+MaBoSSNetwork::MaBoSSNetwork()
 {
 	// This is needed for the external functions
 	MaBEstEngine::init();
@@ -17,25 +17,26 @@ MaBossNetwork::MaBossNetwork()
 }
 
 /* Default destructor */
-MaBossNetwork::~MaBossNetwork()
+MaBoSSNetwork::~MaBoSSNetwork()
 {
 	delete network;
 }
 
 /* Set the name/id of the boolean model */
-void MaBossNetwork::set_model_id(std::string id)
+void MaBoSSNetwork::set_model_id(std::string id)
 {
 	this->model_id = id;
 }
 
 /* Get the name/id of the boolean model */
-std::string MaBossNetwork::get_model_id()
+std::string MaBoSSNetwork::get_model_id()
 {
 	return this->model_id;
 }
 
+// TODO
 /* Read properties from XML parameter file for network */
-void MaBossNetwork::read_properties( ReadXML* reader, std::string what )
+/*void MaBossNetwork::read_properties( ReadXML* reader, std::string what )
 {
 	reader->getDoubleValue( what, "network_update_step", &update_time );
 	
@@ -59,31 +60,23 @@ void MaBossNetwork::read_properties( ReadXML* reader, std::string what )
 			next ++;
 		}
 	}
-}
-
-/* Write current properties to output stream */
-void MaBossNetwork::write_properties(std::ostream& os)
-{
-	os << "\t<!-- ------ MaBoSS network properties ------- -->" << std::endl;
-	os << "\t\t<network_update_step> " << update_time << " </network_update_step>" << std::endl;
-	os << std::endl;
-}
+}*/
 
 /* Initialize the network by reading input files */
-void MaBossNetwork::init( std::string networkFile, std::string configFile )
+void MaBoSSNetwork::init( std::string networkFile, std::string configFile )
 {
-		network->parse(networkFile.c_str());
-		conffile = configFile;
-		runConfig->parse(network, conffile.c_str());
-		
-		// This was missing, for some reason
-		network->updateRandomGenerator(RunConfig::getInstance());
-		
-		initNetworkState();
+	network->parse(networkFile.c_str());
+	conffile = configFile;
+	runConfig->parse(network, conffile.c_str());
+	
+	// This was missing, for some reason
+	network->updateRandomGenerator(RunConfig::getInstance());
+	
+	initNetworkState();
 }
 
 /* Initialize the state of the network */
-void MaBossNetwork::initNetworkState()
+void MaBoSSNetwork::initNetworkState()
 {
 	NetworkState initial_state;
 	network->initStates(initial_state);
@@ -99,7 +92,7 @@ void MaBossNetwork::initNetworkState()
 }
 
 /* Set values of nodes to default values */
-void MaBossNetwork::set_default( std::vector<bool>* nodes )
+void MaBoSSNetwork::set_default( std::vector<bool>* nodes )
 {
 	for ( int i = 0; i < (int) def_nodes.size(); i++ )
 	{
@@ -108,7 +101,7 @@ void MaBossNetwork::set_default( std::vector<bool>* nodes )
 }
 
 /* Load previous network states and inputs */
-void MaBossNetwork::load( NetworkState* netState, std::vector<bool>* inputs )
+void MaBoSSNetwork::load( NetworkState* netState, std::vector<bool>* inputs )
 {
 	std::vector<Node*> nodes;
 	nodes = network->getNodes();
@@ -124,7 +117,7 @@ void MaBossNetwork::load( NetworkState* netState, std::vector<bool>* inputs )
 }
 
 /* Load symbol rates value if they are in the map for the current cell line, useful for mutations */
-void MaBossNetwork::loadSymbol( int cellline )
+void MaBoSSNetwork::loadSymbol( int cellline )
 {
 	for (auto symit = mbRates.begin(); symit != mbRates.end(); symit++ )
 	{
@@ -143,12 +136,12 @@ void MaBossNetwork::loadSymbol( int cellline )
 }
 
 /* Run the current network */
-bool MaBossNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val, int cellline )
+bool MaBoSSNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val, int cellline )
 {
 	runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
 
 	// Load network state and values of current cell in the network instance
-	loadSymbol( cellline );
+	//loadSymbol( cellline );
 	load( netStates, nodes_val );
 	MaBEstEngine mabossEngine( network, runConfig );
 	// No output from MaBoSS run
@@ -183,7 +176,7 @@ bool MaBossNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val, 
 }
 
 /* Print current state of all the nodes of the network */
-void MaBossNetwork::printNodes(NetworkState* netStates)
+void MaBoSSNetwork::printNodes(NetworkState* netStates)
 {
 	std::vector<Node*> node3 = network->getNodes();
 	for ( auto node: node3 )
@@ -194,7 +187,7 @@ void MaBossNetwork::printNodes(NetworkState* netStates)
 }
 
 /* Return the index of node based on node's name */
-int MaBossNetwork::get_node_index( std::string name )
+int MaBoSSNetwork::get_node_index( std::string name )
 {
 	auto res = node_names.find(name);
 	if ( res != node_names.end() )

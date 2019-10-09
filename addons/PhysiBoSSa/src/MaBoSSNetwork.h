@@ -12,9 +12,8 @@
  */
 
 #include "MaBEstEngine.h"
-#include "readXML.h"
 
-class MaBossNetwork
+class MaBoSSNetwork
 {
 
 	private:
@@ -50,9 +49,9 @@ class MaBossNetwork
 
 	public:
 		/** \brief Constructor */
-		MaBossNetwork();
+		MaBoSSNetwork();
 		/** \brief Destructor */
-		~MaBossNetwork();
+		~MaBoSSNetwork();
 
 		/** \brief Initialize the network from input files */
 		void init( std::string networkFile, std::string configFile );
@@ -65,9 +64,6 @@ class MaBossNetwork
 		
 		/** \brief Set values of nodes to default values */
 		void set_default( std::vector<bool>* nodes );
-
-		/** \brief Read properties from XML parameter file for network */
-		void read_properties( ReadXML* reader, std::string what );
 		
 		/** \brief Print current state of all the nodes of the network */
 		void printNodes( NetworkState* netStates);
@@ -99,9 +95,6 @@ class MaBossNetwork
 		 * Return 0 if node is 0 \n
 		 * Return 1 if node is 1 */
 		int get_node_index( std::string name );
-
-		/** \brief Write current properties to output stream */
-		void write_properties(std::ostream& os);
 
 		void set_model_id(std::string);
 

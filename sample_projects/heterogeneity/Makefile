@@ -50,7 +50,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSSa_OBJECTS := PhysiBoSSa.o MaBoSSNetwork.o
+PhysiBoSSa_OBJECTS := MaBoSSNetwork.o
 
 PhysiCell_custom_module_OBJECTS := heterogeneity.o
 
@@ -143,9 +143,6 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make clean && make install_alib
-    
-PhysiBoSSa.o: ./addon/PhysiBoSSa/src/PhysiBoSSa.cpp
-	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/PhysiBoSSa.cpp
 
 MaBoSSNetwork.o: ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
 	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
