@@ -145,8 +145,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make clean && make install_alib
 
-MaBoSSNetwork.o: ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
-	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
+MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
+	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp

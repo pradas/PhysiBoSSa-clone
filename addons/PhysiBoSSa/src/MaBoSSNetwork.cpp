@@ -1,4 +1,4 @@
-#include "maboss_network.h"
+#include "MaBoSSNetwork.h"
 #include "utils.h"
 
 /* Default constructor */
