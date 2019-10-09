@@ -12,7 +12,7 @@ ifdef PHYSICELL_CPP
 endif
 
 ### MaBoSS directory
-MABOSS_DIR = addons/PhysiBaSS/MaBoSS-env-2.0/engine
+MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
 CUR_DIR = $(shell pwd)
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS
 INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include
@@ -50,14 +50,14 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBaSS_OBJECTS := PhysiBaSS.o MaBoSSNetwork.o
+PhysiBoSSa_OBJECTS := PhysiBoSSa.o MaBoSSNetwork.o
 
 PhysiCell_custom_module_OBJECTS := heterogeneity.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := MaBoSS $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBaSS_OBJECTS)
+ALL_OBJECTS := MaBoSS $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS)
 
 # compile the project  
 
@@ -144,11 +144,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make clean && make install_alib
     
-PhysiBaSS.o: ./addon/PhysiBaSS/src/PhysiBaSS.cpp
-	$(COMPILE_COMMAND) -c ./addon/PhysiBaSS/src/PhysiBaSS.cpp
+PhysiBoSSa.o: ./addon/PhysiBoSSa/src/PhysiBoSSa.cpp
+	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/PhysiBoSSa.cpp
 
-MaBoSSNetwork.o: ./addon/PhysiBaSS/src/MaBoSSNetwork.cpp
-	$(COMPILE_COMMAND) -c ./addon/PhysiBaSS/src/MaBoSSNetwork.cpp
+MaBoSSNetwork.o: ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
+	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
 
 heterogeneity.o: ./custom_modules/heterogeneity.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/heterogeneity.cpp

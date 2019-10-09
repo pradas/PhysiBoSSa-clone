@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := heterogeneity
+PROGRAM_NAME := project2D
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -12,7 +12,7 @@ ifdef PHYSICELL_CPP
 endif
 
 ### MaBoSS directory
-MABOSS_DIR = addons/PhysiBaSS/MaBoSS-env-2.0/engine
+MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
 CUR_DIR = $(shell pwd)
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS
 INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include
@@ -43,23 +43,24 @@ COMPILE_COMMAND := $(CC) $(CFLAGS)
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
 
-PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o 
+PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
+PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o 
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBaSS_OBJECTS := PhysiBaSS.o MaBoSSNetwork.o
+PhysiBoSSa_OBJECTS := PhysiBoSSa.o MaBoSSNetwork.o
 
-PhysiCell_custom_module_OBJECTS := heterogeneity.o
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := MaBoSS $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBaSS_OBJECTS)
+ALL_OBJECTS := MaBoSS $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS)
 
-# compile the project  
+# compile the project 
 
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
@@ -132,26 +133,26 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-	
+
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make clean && make install_alib
     
-PhysiBaSS.o: ./addon/PhysiBaSS/main/PhysiBaSS.cpp
-	$(COMPILE_COMMAND) -c ./addon/PhysiBaSS/main/PhysiBaSS.cpp
+PhysiBoSSa.o: ./addon/PhysiBoSSa/src/PhysiBoSSa.cpp
+	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/PhysiBoSSa.cpp
 
-MaBoSSNetwork.o: ./addon/PhysiBaSS/main/MaBoSSNetwork.cpp
-	$(COMPILE_COMMAND) -c ./addon/PhysiBaSS/main/MaBoSSNetwork.cpp
+MaBoSSNetwork.o: ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
+	$(COMPILE_COMMAND) -c ./addon/PhysiBoSSa/src/MaBoSSNetwork.cpp
 
-heterogeneity.o: ./custom_modules/heterogeneity.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/heterogeneity.cpp
+custom.o: ./custom_modules/custom.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 # cleanup
 

@@ -72,14 +72,13 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
-// custom user modules 
+// put custom code modules here! 
 
-#include "./custom_modules/heterogeneity.h" 
+#include "./custom_modules/custom.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -95,31 +94,29 @@ int main( int argc, char* argv[] )
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
-
+	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
-	
-	// PNRG setup 
-	SeedRandom(); 
 	
 	// time setup 
 	std::string time_units = "min"; 
 
 	/* Microenvironment setup */ 
 	
-	setup_microenvironment(); 
-
+	setup_microenvironment(); // modify this in the custom code 
+	
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
-	create_cell_types();
-	setup_tissue();
-	
 	/* Users typically start modifying here. START USERMODS */ 
 	
+	create_cell_types();
+	
+	setup_tissue();
+
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
@@ -142,7 +139,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -166,7 +163,7 @@ int main( int argc, char* argv[] )
 	// main loop 
 	
 	try 
-	{	
+	{		
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
 		{
 			// save data if it's time. 
@@ -201,12 +198,16 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
 			}
-			
+
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
+			
+			/*
+			  Custom add-ons could potentially go here. 
+			*/
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

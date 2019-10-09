@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-1000</x_min>
-		<x_max>1000</x_max>
-		<y_min>-1000</y_min>
-		<y_max>1000</y_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -100,7 +100,7 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">360</interval>
 			<enable>true</enable>
 		</full_data>
 		
@@ -117,8 +117,8 @@
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.00</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+				<decay_rate units="1/min">0.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38.0</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
@@ -136,15 +136,18 @@
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>		
+	</microenvironment_setup>	
 	
 	<user_parameters>
-		<tumor_radius type="double" units="micron">250.0</tumor_radius>
-		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
-		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
-		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
-		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
-		<random_seed type="int" units="dimensionless">0</random_seed>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<!-- example parameters from the template --> 
+		
+		<!-- motile cell type parameters --> 
+		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
+		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
+		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
+		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
+		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
 	</user_parameters>
 	
 </PhysiCell_settings>
