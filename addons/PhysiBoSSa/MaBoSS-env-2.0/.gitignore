@@ -5,6 +5,7 @@
 engine/lib/
 engine/include/
 engine/pub/
+engine/src/libMaBoSS.a
 engine/src/MaBoSS
 engine/src/MaBoSS-client
 engine/src/MaBoSS-server

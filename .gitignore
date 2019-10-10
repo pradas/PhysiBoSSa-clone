@@ -33,3 +33,6 @@
 
 # IDE folders
 .vscode
+
+#Custom
+Makefile-backup
