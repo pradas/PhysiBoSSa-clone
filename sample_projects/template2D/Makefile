@@ -51,7 +51,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o
+PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCycleModels.o
 
 PhysiCell_custom_module_OBJECTS := custom.o
 
@@ -150,6 +150,9 @@ MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
 
 utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
+
+MaBoSSCycleModels.o: ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
+	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
