@@ -52,7 +52,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 PhysiCell_custom_module_OBJECTS := cancer_immune_3D.o
 
-PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o
+PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCycleModels.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -147,6 +147,9 @@ MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
 
 utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
+
+MaBoSSCycleModels.o: ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
 
 cancer_immune_3D.o: ./custom_modules/cancer_immune_3D.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/cancer_immune_3D.cpp

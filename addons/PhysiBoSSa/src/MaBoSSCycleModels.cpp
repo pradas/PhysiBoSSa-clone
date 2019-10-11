@@ -6,7 +6,7 @@ namespace PhysiCell{
 	
 Cycle_Model PhysiBoSSa_TNF, PhysiBoSSa_AGS;
 
-void standard_cycling_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
+void tnf_cycling_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// the cell wants to double its volume 
 	phenotype.volume.target_solid_nuclear *= 2.0; 
@@ -35,7 +35,7 @@ void create_tnf_cycle_model( void )
 	
 	PhysiBoSSa_TNF.transition_rate(0,0) = 0.0432 / 60.0; // MCF10A have ~0.04 1/hr net birth rate
 	
-	PhysiBoSSa_TNF.phases[0].entry_function = standard_cycling_entry_function;
+	PhysiBoSSa_TNF.phases[0].entry_function = tnf_cycling_entry_function;
 		
 	return; 
 }

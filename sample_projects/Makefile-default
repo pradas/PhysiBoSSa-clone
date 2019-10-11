@@ -259,7 +259,7 @@ utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
 
 MaBoSSCycleModels.o: ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
-	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
 
 # cleanup
 
