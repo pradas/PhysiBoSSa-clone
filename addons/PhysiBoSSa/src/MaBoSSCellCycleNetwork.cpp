@@ -1,20 +1,16 @@
-#include "cell_cycle_network.h"
+#include "MaBoSSCellCycleNetwork.h"
 
 
 CellCycleNetwork::CellCycleNetwork()
 {
-	this->cycle_mode = 1;
 	this->time_to_update = 0;
-	this->got_activated = 0;
 	this->maboss = nullptr;
 }
 
-CellCycleNetwork::CellCycleNetwork( MaBossNetwork* mboss )
+CellCycleNetwork::CellCycleNetwork( MaBoSSNetwork* mboss )
 {
-	this->cycle_mode = 1;
 	this->set_maboss( mboss );
 	this->time_to_update = ( 1 + 0.5*UniformRandom11() ) * maboss->update_time_step();
-	this->got_activated = 0;
 }
 
 CellCycleNetwork::~CellCycleNetwork()
@@ -32,11 +28,10 @@ void CellCycleNetwork::copy_cycle( CellCycleNetwork* copy_me)
 	set_time_to_update();
 	nodes = copy_me->nodes;
 	networkState = copy_me->networkState;
-	got_activated = 0;
 }
 
 /* Initialization: set network */
-void CellCycleNetwork::set_maboss( MaBossNetwork* mboss )
+void CellCycleNetwork::set_maboss( MaBoSSNetwork* mboss )
 {
 	maboss = mboss;
 	set_time_to_update();
@@ -128,62 +123,8 @@ void CellCycleNetwork::set_input_nodes()
 
 }
 
-/* Dying cell step */
-void CellCycleNetwork::dying_apoptosis(double dt)
-{
-	if ( elapsed_time >= phase->duration )
-		mycell->to_remove();
-	else 
-	{
-		if( ! mycell->over(PhysiCell_constants::cell_removal_threshold_volume) )
-			mycell->to_remove();
-	}
-	elapsed_time += dt;
-	demobilize(dt);	
-}
-
-/* Necrosis_swelling dying step */
-void CellCycleNetwork::dying_necrosis_swell(double dt)
-{
-	if ( mycell->rupture() )
-	{
-		set_current_phase(PhysiCell_constants::necrotic_lysed); 
-		mycell->update_target_fluid_nuclear(0,0); 
-		start_necrosis_lysis(); 
-	}
-	elapsed_time += dt;
-	demobilize(dt);	
-}
-
-/* Necrosis lysis dying step */
-void CellCycleNetwork::dying_necrosis_lysed(double dt )
-{
-	elapsed_time += dt; 
-	if( ! mycell->over(PhysiCell_constants::cell_removal_threshold_volume) )
-		mycell->to_remove();	
-	demobilize(dt);	
-}
-
-/* Post-mitotic cell step */
-void CellCycleNetwork::after_division(double dt)
-{
-	if ( elapsed_time >= phase->duration )
-	{
-		set_current_phase( PhysiCell_constants::Ki67_negative );
-		// if no G0 phase, skip directly to cycling phase
-		if ( phase->duration == 0 )
-		{
-			set_current_phase( PhysiCell_constants::Ki67_positive_premitotic );
-			mycell->update_target_nuclear(2.0);
-		}
-
-	}
-	else
-		elapsed_time += dt;
-}
-
 /* Update MaboSS network states */
-void CellCycleNetwork::run_maboss(double dt, double t)
+void CellCycleNetwork::run_maboss()
 {
 	set_input_nodes();
 	bool converged;
@@ -194,96 +135,9 @@ void CellCycleNetwork::run_maboss(double dt, double t)
 
 	//if ( !converged )
 	//	randomize_nodes();
-	from_nodes_to_cell(dt, t);
+	//from_nodes_to_cell(dt, t);
 	
 	set_time_to_update();
-}
-
-/* Do one cell cycle step */
-void CellCycleNetwork::do_one_cycle_step( double dt, double t )
-{
-	// Specific action for each cell phase
-	switch( phase->code )
-	{
-		// Dying cells: we don't need to update their network
-		case PhysiCell_constants::apoptotic:
-			dying_apoptosis(dt);
-			return;
-			break;
-	
-		case PhysiCell_constants::necrotic_swelling:
-			dying_necrosis_swell(dt);
-			return;
-			break;
-	
-		case PhysiCell_constants::necrotic_lysed:
-			dying_necrosis_lysed(dt);
-			return;
-			break;
-				
-		// go to cycling if resting time passed 
-		case PhysiCell_constants::Ki67_negative:
-			if ( elapsed_time > phase->duration )
-				do_proliferation(dt);
-			break;
-
-			// Just after division
-		case PhysiCell_constants::Ki67_positive_postmitotic:
-			after_division(dt);
-			break;
-
-			// Just before division
-		case PhysiCell_constants::Ki67_positive_premitotic:
-			// Reached size to divide
-			if ( mycell->target_reached() )
-			{
-				set_current_phase( PhysiCell_constants::Ki67_positive_postmitotic );
-				mycell->to_divide();	
-				mycell->update_target_nuclear(0.5);
-				return;
-			}
-			break;	
-		default:
-			break;
-	}
-	
-	// Random chance of dying
-	if ( UniformRandom() <= phase->death_rate*dt )
-	{
-		set_current_phase( PhysiCell_constants::apoptotic );
-		start_apoptosis();
-		return;
-	}	
-	
-	// If has oxygen density, check if lacks of oxygen or not
-	if ( mycell->necrotic_oxygen() )
-	{
-		set_current_phase( PhysiCell_constants::necrotic_swelling );
-		start_necrosis_swelling(dt);
-		return;
-	}
-
-
-	// update network every cycle_time steps only
-	if ( time_to_update <= 0 )
-		run_maboss(dt, t);
-	else
-		time_to_update -= dt;
-	
-	// update elapsed time in between updates
-	elapsed_time += dt;
-}
-
-/* Go to proliferative if needed */
-void CellCycleNetwork::do_proliferation( double dt )
-{
-	// If cells is in G0 (quiescent)
-	if ( phase->code == PhysiCell_constants::Ki67_negative )
-	{
-		// switch to pre-mitotic phase 
-		set_current_phase( PhysiCell_constants::Ki67_positive_premitotic );
-		mycell->update_target_nuclear(2.0);
-	}
 }
 
 /* Read the value of output BN nodes and transfer action to the cell */
@@ -449,40 +303,3 @@ void CellCycleNetwork::from_nodes_to_cell(double dt, double t)
 		std::cout << "======================================================================================="  << std::endl;
 	}
 }
-
-/* De-mobilize the cell components (dying cells): actin, cadherins, integrins */
-void CellCycleNetwork::demobilize(double dt)
-{
-		mycell->evolve_motility_coef( 0, dt );
-		mycell->evolve_polarity_coef( 0, dt );
-		mycell->evolve_cellcell_coef( 0, dt );
-		mycell->evolve_integrin_coef( 0, dt );
-}
-
-/* Output current phase of the cell */
-void CellCycleNetwork::output( std::string& delimeter, std::ofstream* file )
-{
-	int ind;
-	(*file) << mycell->contact_cell() << delimeter;
-	(*file) << phase->code << delimeter;
-	ind = maboss->get_node_index("Matrix_adhesion");
-	if ( ind >= 0 )
-			(*file) << mycell->local_density("tgfb") << delimeter << -1 ;
-	//	(*file) << (nodes[ind] ? 1:0) << delimeter;
-	else
-	{
-		ind = maboss->get_node_index( "Survival" );
-		if ( ind >= 0 )
-		{
-			(*file) << got_activated << delimeter;
-			(*file) << -1;
-			// tmp solution to print current network state 
-			//for ( int val : nodes )
-			//	(*file)	<< val;
-		}	
-	   else 
-			(*file) << -1 << delimeter << -1;
-
-	}
-}
-

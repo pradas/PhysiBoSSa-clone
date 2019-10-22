@@ -2,8 +2,7 @@
 #define __CELL_CYCLE_NETWORK_H
 
 #include "MaBEstEngine.h"
-#include "cell_cycle.h"
-#include "maboss_network.h"
+#include "MaBoSSNetwork.h"
 
 /**
  * \class CellCycleNetwork
@@ -18,12 +17,12 @@
  *	\author Gaelle Letort, Institut Curie
  */
 
-class CellCycleNetwork : public CellCycle
+class CellCycleNetwork
 {
 	private:
 
 			/** \brief MaBoss Network doing the job */
-			MaBossNetwork* maboss;
+			MaBoSSNetwork* maboss;
 			
 			/** \brief Vector of nodes state current value (0 or 1) */
 			std::vector<bool> nodes;
@@ -44,14 +43,16 @@ class CellCycleNetwork : public CellCycle
 		/** \brief Default constructor */
 		CellCycleNetwork();
 		/** \brief Constructor with given network instance */
-		CellCycleNetwork( MaBossNetwork* mboss);
+		CellCycleNetwork( MaBoSSNetwork* mboss);
 		/** \brief Class destructor */
 		~CellCycleNetwork();
+
+		MaBoSSNetwork* CellCycleNetwork::getMaBoSS();
 
 		/** \brief Initialization: set network 
 		 *
 		 * @param mboss reference to the common object handling MaBoSS runs */
-		void set_maboss( MaBossNetwork* mboss );
+		void set_maboss( MaBoSSNetwork* mboss );
 	
 		/** \brief Copy all parameters specific to cell cycle network object 
 		 *
@@ -63,7 +64,7 @@ class CellCycleNetwork : public CellCycle
 		 *
 		 * @param dt update network time step 
 		 * @param t current time in the simulation */
-		void run_maboss(double dt, double t);
+		void run_maboss();
 		
 		/** \brief Set inputs of the network from current cell state 
 		 *

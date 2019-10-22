@@ -12,6 +12,7 @@
  */
 
 #include "MaBEstEngine.h"
+#include "utils.h"
 
 class MaBoSSNetwork
 {

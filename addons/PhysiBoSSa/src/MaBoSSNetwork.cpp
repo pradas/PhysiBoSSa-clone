@@ -1,5 +1,4 @@
 #include "MaBoSSNetwork.h"
-#include "utils.h"
 
 /* Default constructor */
 MaBoSSNetwork::MaBoSSNetwork()
