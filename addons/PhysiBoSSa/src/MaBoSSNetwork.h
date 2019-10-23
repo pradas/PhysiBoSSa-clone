@@ -82,7 +82,7 @@ class MaBoSSNetwork
 		 * Otherwise put new network states in input netStates
 		 * cellline: index of current cell_line for specific properties (rates) 
 		 * */
-		bool run( NetworkState* netStates, std::vector<bool>* nodes_val, int cellline );
+		bool run( NetworkState* netStates, std::vector<bool>* nodes_val);
 		
 		/** \brief Load previous network states and inputs */
 		void load( NetworkState* netState, std::vector<bool>* inputs );

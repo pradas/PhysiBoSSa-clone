@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := project2D_tnf
+PROGRAM_NAME := spheroid_TNF
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -51,7 +51,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCycleModels.o
+PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCellCycleNetwork.o
 
 PhysiCell_custom_module_OBJECTS := custom.o
 
@@ -63,7 +63,7 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBo
 # compile the project 
 
 all: MaBoSS main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
+	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
 
 # PhysiCell core components	
 
@@ -74,16 +74,16 @@ PhysiCell_digital_cell_line.o: ./core/PhysiCell_digital_cell_line.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_digital_cell_line.cpp
 
 PhysiCell_cell.o: ./core/PhysiCell_cell.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_cell.cpp 
+	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell.cpp 
 
 PhysiCell_cell_container.o: ./core/PhysiCell_cell_container.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_cell_container.cpp 
+	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell_container.cpp 
 	
 PhysiCell_standard_models.o: ./core/PhysiCell_standard_models.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_standard_models.cpp 
+	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_standard_models.cpp 
 	
 PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_utilities.cpp 
+	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_utilities.cpp 
 	
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp 
@@ -126,19 +126,20 @@ PhysiCell_SVG.o: ./modules/PhysiCell_SVG.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_SVG.cpp
 
 PhysiCell_pathology.o: ./modules/PhysiCell_pathology.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pathology.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_pathology.cpp
 
 PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_MultiCellDS.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_various_outputs.cpp
 
+	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 # user-defined PhysiCell modules
 
@@ -151,11 +152,11 @@ MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
 utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
 
-MaBoSSCycleModels.o: ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
+MaBoSSCellCycleNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
 
 custom.o: ./custom_modules/custom.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
 
 # cleanup
 

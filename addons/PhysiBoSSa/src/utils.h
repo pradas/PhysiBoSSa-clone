@@ -4,7 +4,6 @@
 #include <ctime>
 #include <random>
 
-long SeedRandom( void );
 int UniformInt();
 double UniformRandom( void );
 double UniformRandom11( void );

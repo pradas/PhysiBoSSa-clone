@@ -98,6 +98,9 @@ int main( int argc, char* argv[] )
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
+	// PNRG setup 
+	SeedRandom(); 
+	
 	// time setup 
 	std::string time_units = "min"; 
 
@@ -139,7 +142,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -207,11 +210,11 @@ int main( int argc, char* argv[] )
 			
 			/*
 			  Custom add-ons could potentially go here. 
-			*/
+			*/			
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
-		
+
 		if( PhysiCell_settings.enable_legacy_saves == true )
 		{			
 			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
@@ -230,6 +233,7 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+
 	
 	// timer 
 	

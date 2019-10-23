@@ -98,13 +98,13 @@ void create_cell_types( void )
 	
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
 	
-	// needed for a 2-D simulation: 
+	// only needed for a 2-D simulation: 
 	
-	/* grab code from heterogeneity */ 
-	
+	/*
 	cell_defaults.functions.set_orientation = up_orientation; 
 	cell_defaults.phenotype.geometry.polarity = 1.0;
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
+	*/
 	
 	// make sure the defaults are self-consistent. 
 	
@@ -131,7 +131,7 @@ void create_cell_types( void )
 	
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
-
+	
 	// Now, let's define another cell type. 
 	// It's best to just copy the default and modify it. 
 	
@@ -142,21 +142,23 @@ void create_cell_types( void )
 	motile_cell.type = 1; 
 	motile_cell.name = "motile tumor cell"; 
 	
-	// make sure the new cell type has its own reference phenotype
+	// make sure the new cell type has its own reference phenotyhpe
 	
 	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
 	
 	// enable random motility 
 	motile_cell.phenotype.motility.is_motile = true; 
-	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
-	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
+	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; // 15 minutes
+	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25; // 0.25 micron/minute 
 	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
 	
 	// Set cell-cell adhesion to 5% of other cells 
-	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
+	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+		parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
 	
 	// Set apoptosis to zero 
-	motile_cell.phenotype.death.rates[apoptosis_model_index] = parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
+	motile_cell.phenotype.death.rates[apoptosis_model_index] = 
+		parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
 	
 	// Set proliferation to 10% of other cells. 
 	// Alter the transition rate from G0G1 state to S state
@@ -170,20 +172,21 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
-	
+/*	
+	default_microenvironment_options.X_range = {-500, 500}; 
+	default_microenvironment_options.Y_range = {-500, 500}; 
+	default_microenvironment_options.Z_range = {-500, 500}; 
+*/	
 	// make sure to override and go back to 2D 
-	if( default_microenvironment_options.simulate_2D == false )
+	if( default_microenvironment_options.simulate_2D == true )
 	{
-		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
-		default_microenvironment_options.simulate_2D = true; 
-	}
+		std::cout << "Warning: overriding XML config option and setting to 3D!" << std::endl; 
+		default_microenvironment_options.simulate_2D = false; 
+	}	
 	
-/* now this is in XML 	
+	
+/*
+	// all this is in XML as of August 2019 (1.6.0)
 	// no gradients need for this example 
 
 	default_microenvironment_options.calculate_gradients = false; 
@@ -200,9 +203,6 @@ void setup_microenvironment( void )
 	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
 */
 	
-	// put any custom code to set non-homogeneous initial conditions or 
-	// extra Dirichlet nodes here. 
-	
 	// initialize BioFVM 
 	
 	initialize_microenvironment(); 	
@@ -215,37 +215,38 @@ void setup_tissue( void )
 	// create some cells near the origin
 	
 	Cell* pC;
+	MaBoSSNetwork* maboss;
 
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
-	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	maboss = new MaBoSSNetwork();
 	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
 	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
 
 	pC = create_cell(); 
-	pC->assign_position( -100, 0, 0.0 );
-	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	pC->assign_position( -100.0, 0.0, 1.0 );
+	maboss = new MaBoSSNetwork();
 	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
 	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
-
+	
 	pC = create_cell(); 
-	pC->assign_position( 0, 100, 0.0 );
-	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	pC->assign_position( 0, 100.0, -7.0 );
+	maboss = new MaBoSSNetwork();
 	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
 	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
-
+	
 	// now create a motile cell 
 	
 	pC = create_cell( motile_cell ); 
-	pC->assign_position( 15.0, -18.0, 0.0 );
-	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	pC->assign_position( 15.0, -18.0, 3.0 );
+	maboss = new MaBoSSNetwork();
 	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
 	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
-	
+
 	return; 
 }
 
-void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt )
+void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 {
 	pCell->maboss_cycle_network->run_maboss();
 }
@@ -255,11 +256,14 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	// start with flow cytometry coloring 
 	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
-		
-	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
+	
+	// if the cell is motile and not dead, paint it black 
+	
+	if( pCell->phenotype.death.dead == false && 
+		pCell->type == 1 )
 	{
 		 output[0] = "black"; 
-		 output[2] = "black"; 
+		 output[2] = "black"; 	
 	}
 	
 	return output; 

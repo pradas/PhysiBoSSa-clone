@@ -135,7 +135,7 @@ void MaBoSSNetwork::loadSymbol( int cellline )
 }
 
 /* Run the current network */
-bool MaBoSSNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val, int cellline )
+bool MaBoSSNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val)
 {
 	runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
 

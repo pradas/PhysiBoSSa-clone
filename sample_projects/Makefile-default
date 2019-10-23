@@ -144,14 +144,14 @@ beta-testing:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/beta_testing/config/* ./config/
 
-template2D_tnf:
-	cp ./sample_projects/template2D_tnf/custom_modules/* ./custom_modules/
+spheroid_TNF: 	
+	cp ./sample_projects/spheroid_TNF/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/template2D_tnf/main-2D.cpp ./main.cpp 
+	cp ./sample_projects/spheroid_TNF/main-spheroid_TNF.cpp ./main.cpp 
 	cp Makefile Makefile-backup
-	cp ./sample_projects/template2D_tnf/Makefile .
+	cp ./sample_projects/spheroid_TNF/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/template2D_tnf/config/* ./config/
+	cp ./sample_projects/spheroid_TNF/config/* ./config/
 	
 # early examples for convergence testing 
 
