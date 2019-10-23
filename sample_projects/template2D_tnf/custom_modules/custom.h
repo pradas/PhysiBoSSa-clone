@@ -68,6 +68,9 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
+#include "../addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.h"
+#include "../addons/PhysiBoSSa/src/MaBoSSNetwork.h"
+
 using namespace BioFVM; 
 using namespace PhysiCell;
 

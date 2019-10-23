@@ -130,7 +130,7 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
 	
 	// add custom data here, if any 
-	
+	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
 
 	// Now, let's define another cell type. 
 	// It's best to just copy the default and modify it. 
@@ -218,19 +218,36 @@ void setup_tissue( void )
 
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
+	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
 
 	pC = create_cell(); 
 	pC->assign_position( -100, 0, 0.0 );
-	
+	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+
 	pC = create_cell(); 
 	pC->assign_position( 0, 100, 0.0 );
-	
+	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+
 	// now create a motile cell 
 	
 	pC = create_cell( motile_cell ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
+	MaBoSSNetwork* maboss = new MaBoSSNetwork();
+	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
 	
 	return; 
+}
+
+void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	pCell->maboss_cycle_network->run_maboss();
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
