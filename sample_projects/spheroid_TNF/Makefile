@@ -155,6 +155,9 @@ utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 MaBoSSCellCycleNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
 
+MaBoSS-clean:
+	cd $(MABOSS_DIR)/src && make clean
+
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
 
@@ -169,7 +172,7 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	
-clean:
+clean: MaBoSS-clean
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	

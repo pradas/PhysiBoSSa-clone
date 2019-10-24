@@ -11,12 +11,6 @@ ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
 
-### MaBoSS directory
-MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
-CUR_DIR = $(shell pwd)
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
-INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include
-
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
 # ARCH := corei7
@@ -51,14 +45,12 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCycleModels.o
-
 PhysiCell_custom_module_OBJECTS := .o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
 EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_mechanics_2.cpp \
  ./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
@@ -257,18 +249,6 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 # user-defined PhysiCell modules
-
-MaBoSS:
-	cd $(MABOSS_DIR)/src && make clean && make install_alib
-
-MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
-
-utils.o: ./addons/PhysiBoSSa/src/utils.cpp
-	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
-
-MaBoSSCycleModels.o: ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCycleModels.cpp
 
 # cleanup
 
