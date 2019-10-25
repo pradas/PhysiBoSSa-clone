@@ -117,6 +117,7 @@ void create_cell_types( void )
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
+	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
 	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
 	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
@@ -127,43 +128,21 @@ void create_cell_types( void )
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 40; 
+
+	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = 10; 
+	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 0.5; 
 	
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
-	
-	// Now, let's define another cell type. 
-	// It's best to just copy the default and modify it. 
-	
-	// make this cell type randomly motile, less adhesive, greater survival, 
-	// and less proliferative 
-	
-	motile_cell = cell_defaults; 
-	motile_cell.type = 1; 
-	motile_cell.name = "motile tumor cell"; 
-	
-	// make sure the new cell type has its own reference phenotyhpe
-	
-	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
-	
-	// enable random motility 
-	motile_cell.phenotype.motility.is_motile = true; 
-	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; // 15 minutes
-	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25; // 0.25 micron/minute 
-	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
-	
-	// Set cell-cell adhesion to 5% of other cells 
-	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
-		parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
-	
-	// Set apoptosis to zero 
-	motile_cell.phenotype.death.rates[apoptosis_model_index] = 
-		parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
-	
-	// Set proliferation to 10% of other cells. 
-	// Alter the transition rate from G0G1 state to S state
-	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
-		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
+
+	cell_defaults.phenotype.geometry.radius = 8.413;
+	cell_defaults.phenotype.geometry.nuclear_radius = 5.052;
+	cell_defaults.phenotype.volume.fluid_fraction = 0.75;
+	cell_defaults.phenotype.volume.nuclear_solid = 135;
+	cell_defaults.phenotype.volume.cytoplasmic_solid = 486;
+	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = 3.6;
 	
 	return; 
 }
@@ -217,31 +196,20 @@ void setup_tissue( void )
 	Cell* pC;
 	MaBoSSNetwork* maboss;
 
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-	maboss = new MaBoSSNetwork();
-	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+	std::vector<init_record> cells = read_init_file(parameters.strings("init_filename"), ';', true);
 
-	pC = create_cell(); 
-	pC->assign_position( -100.0, 0.0, 1.0 );
-	maboss = new MaBoSSNetwork();
-	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
-	
-	pC = create_cell(); 
-	pC->assign_position( 0, 100.0, -7.0 );
-	maboss = new MaBoSSNetwork();
-	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
-	
-	// now create a motile cell 
-	
-	pC = create_cell( motile_cell ); 
-	pC->assign_position( 15.0, -18.0, 3.0 );
-	maboss = new MaBoSSNetwork();
-	maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+	for (int i = 0; i < cells.size(); i++)
+	{
+		int x = cells[i].x;
+		int y = cells[i].y;
+		int z = cells[i].z;
+
+		pC = create_cell(); 
+		pC->assign_position( x, y, z );
+		maboss = new MaBoSSNetwork();
+		maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+		pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+	}
 
 	return; 
 }
@@ -267,4 +235,54 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	}
 	
 	return output; 
+}
+
+std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
+{ 
+
+	// File pointer 
+	std::fstream fin; 
+
+	std::vector<init_record> result;
+
+	// Open an existing file 
+	fin.open(filename, std::ios::in); 
+
+	// Read the Data from the file 
+	// as String Vector 
+	std::vector<std::string> row; 
+	std::string line, word, temp;
+
+	if(header)
+		getline(fin, line);
+
+	do 
+	{
+		row.clear(); 
+
+		// read an entire row and 
+		// store it in a string variable 'line' 
+		getline(fin, line);
+
+		// used for breaking words 
+		std::stringstream s(line); 
+
+		// read every column data of a row and 
+		// store it in a string variable, 'word' 
+		while (getline(s, word, delimiter)) { 
+
+			// add all the column data 
+			// of a row to a vector 
+			row.push_back(word); 
+		}
+
+		init_record record;
+		record.x = std::stof(row[2]);
+		record.y = std::stof(row[3]);
+		record.z = std::stof(row[4]);
+
+		result.push_back(record);
+	} while (!fin.eof());
+	
+	return result;
 }

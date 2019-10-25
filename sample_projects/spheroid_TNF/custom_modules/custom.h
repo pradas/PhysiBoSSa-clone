@@ -74,6 +74,13 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
+struct init_record
+{
+	float x;
+	float y;
+	float z;
+};
+
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
 // any additional cell types (beyond cell_defaults)
@@ -94,3 +101,5 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+
+std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
