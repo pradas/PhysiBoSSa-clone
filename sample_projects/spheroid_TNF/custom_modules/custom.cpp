@@ -92,7 +92,7 @@ void create_cell_types( void )
 	
 	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
+	cell_defaults.functions.cycle_model = Ki67_advanced; 
 	
 	// set default_cell_functions; 
 	
@@ -130,12 +130,23 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 40; 
 
-	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = 10; 
-	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = 0.0025; 
+	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0.1; 
 	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 0.5; 
 	
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
+
+	cell_defaults.phenotype.motility.migration_bias = 0.1;
+	cell_defaults.phenotype.motility.migration_speed = 0.01;
+	cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 2.0;
+	cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 10.0;
+
+	cell_defaults.parameters.o2_necrosis_threshold = 0;
+	cell_defaults.parameters.o2_proliferation_threshold = 0;
+	cell_defaults.parameters.o2_hypoxic_threshold = 40;
+	cell_defaults.parameters.o2_reference = 40;
+	cell_defaults.parameters.o2_proliferation_saturation = 40;
 
 	cell_defaults.phenotype.geometry.radius = 8.413;
 	cell_defaults.phenotype.geometry.nuclear_radius = 5.052;
@@ -144,6 +155,8 @@ void create_cell_types( void )
 	cell_defaults.phenotype.volume.cytoplasmic_solid = 486;
 	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = 3.6;
 	
+	cell_defaults.custom_data.add_variable("tnf_threshold", "dimensionless", 2.8e-05);
+
 	return; 
 }
 
