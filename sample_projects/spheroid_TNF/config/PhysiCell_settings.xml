@@ -134,7 +134,7 @@
 
 		<options>
 			<calculate_gradients>false</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
@@ -152,7 +152,14 @@
 		
 		<!-- init file --> 
 		<init_filename type="string" units="">./custom_modules/init.txt</init_filename>
-		
+
+		<duration_add_tnf type="int" units="">10</duration_add_tnf>
+		<time_remove_tnf type="int" units="">8000</time_remove_tnf>
+		<time_add_tnf type="int" units="">150</time_add_tnf>
+		<mode_injection type="int" units="">1</mode_injection>
+
+		<threshold_tnf type="double" units="">1.25</threshold_tnf>
+
 	</user_parameters>
 	
 	

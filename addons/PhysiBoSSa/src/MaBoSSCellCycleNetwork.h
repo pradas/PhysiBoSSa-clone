@@ -44,6 +44,10 @@ class CellCycleNetwork
 		/** \brief Class destructor */
 		~CellCycleNetwork();
 
+		inline std::vector<bool> * get_nodes() {return &nodes;}
+
+		inline MaBoSSNetwork* get_maboss() {return maboss;}
+
 		/** \brief Initialization: set network 
 		 *
 		 * @param mboss reference to the common object handling MaBoSS runs */

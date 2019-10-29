@@ -229,7 +229,21 @@ void setup_tissue( void )
 
 void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 {
+	std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
+	set_input_nodes(pCell, nodes);
+
 	pCell->maboss_cycle_network->run_maboss();
+}
+
+void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
+	
+	int tnf_maboss_index = pCell->maboss_cycle_network->get_maboss()->get_node_index("TNF");
+	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+
+	if (tnf_maboss_index != -1 && tnf_substrate_index != -1)
+	{
+		nodes->at(tnf_maboss_index) = (pCell->internalized_substrates->at(tnf_substrate_index) > parameters.doubles("threshold_tnf"));
+	}
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
