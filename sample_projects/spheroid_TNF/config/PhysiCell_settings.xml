@@ -158,7 +158,7 @@
 		<time_add_tnf type="int" units="">150</time_add_tnf>
 		<mode_injection type="int" units="">1</mode_injection>
 
-		<threshold_tnf type="double" units="">1.25</threshold_tnf>
+		<threshold_tnf type="double" units="dimensionless">2.8e-05</threshold_tnf>
 
 	</user_parameters>
 	

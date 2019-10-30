@@ -155,7 +155,7 @@ void create_cell_types( void )
 	cell_defaults.phenotype.volume.cytoplasmic_solid = 486;
 	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = 3.6;
 	
-	cell_defaults.custom_data.add_variable("tnf_threshold", "dimensionless", 2.8e-05);
+	cell_defaults.custom_data.add_variable("got_activated", "", 0);
 
 	return; 
 }
@@ -233,6 +233,8 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 	set_input_nodes(pCell, nodes);
 
 	pCell->maboss_cycle_network->run_maboss();
+
+	from_nodes_to_cell(pCell, phenotype, dt);
 }
 
 void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
@@ -269,7 +271,6 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 
 	// File pointer 
 	std::fstream fin; 
-
 	std::vector<init_record> result;
 
 	// Open an existing file 
@@ -278,7 +279,7 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 	// Read the Data from the file 
 	// as String Vector 
 	std::vector<std::string> row; 
-	std::string line, word, temp;
+	std::string line, word;
 
 	if(header)
 		getline(fin, line);
@@ -312,4 +313,61 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 	} while (!fin.eof());
 	
 	return result;
+}
+
+/* Go to proliferative if needed */
+void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// If cells is in G0 (quiescent)
+	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
+	{
+		// switch to pre-mitotic phase
+		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
+		pCell->phenotype.volume.target_solid_nuclear *= 2.0;
+	}
+}
+
+void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
+{
+
+	MaBoSSNetwork* maboss = pCell->maboss_cycle_network->get_maboss();
+	std::vector<bool> &nodes = *pCell->maboss_cycle_network->get_nodes();
+
+	int bn_index = maboss->get_node_index( "Survival" );
+	if ( bn_index != -1 && nodes[bn_index])
+		do_proliferation( pCell, phenotype, dt );
+
+	bn_index = maboss->get_node_index( "Apoptosis" );
+	if ( bn_index != -1 && nodes[bn_index] )
+	{
+		pCell->start_death(PhysiCell_constants::apoptosis_death_model);
+		return;
+	}
+
+	bn_index = maboss->get_node_index( "NonACD" );
+	if ( bn_index != -1 && nodes[bn_index] )
+	{
+		pCell->start_death(PhysiCell_constants::necrosis_death_model);
+		return;
+	}
+
+	// For model with TNF production
+	bn_index = maboss->get_node_index( "NFkB" );
+	if ( bn_index != -1 )
+	{
+		int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+		// produce some TNF
+		if ( nodes[bn_index] )
+		{
+			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 1;
+			pCell->set_internal_uptake_constants(dt);
+
+			int activated_index = pCell->custom_data.find_variable_index( "got_activated" );
+			if ( pCell->custom_data[activated_index] == 0 )
+				pCell->custom_data[activated_index] = 1;
+		}
+		else
+			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
+			pCell->set_internal_uptake_constants(dt);
+	}
 }
