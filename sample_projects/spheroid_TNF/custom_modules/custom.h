@@ -105,3 +105,6 @@ void setup_microenvironment( void );
 std::vector<std::string> my_coloring_function( Cell* );
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
+
+void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
+void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
