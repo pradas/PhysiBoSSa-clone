@@ -360,14 +360,12 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 		if ( nodes[bn_index] )
 		{
 			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = parameters.doubles("secretion_tnf")/microenvironment.voxels(pCell->get_current_voxel_index()).volume;
-			pCell->set_internal_uptake_constants(dt);
-
 			int activated_index = pCell->custom_data.find_variable_index( "got_activated" );
 			if ( pCell->custom_data[activated_index] == 0 )
 				pCell->custom_data[activated_index] = 1;
 		}
 		else
 			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
-			pCell->set_internal_uptake_constants(dt);
+		pCell->set_internal_uptake_constants(dt);
 	}
 }
