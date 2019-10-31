@@ -131,7 +131,7 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 40; 
 
 	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = 0.0025; 
-	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0.1; 
+	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0.0; 
 	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 0.5; 
 	
 	// add custom data here, if any 
@@ -359,7 +359,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 		// produce some TNF
 		if ( nodes[bn_index] )
 		{
-			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 1;
+			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = parameters.doubles("secretion_tnf")/microenvironment.voxels[pCell->get_current_voxel_index()].volume;
 			pCell->set_internal_uptake_constants(dt);
 
 			int activated_index = pCell->custom_data.find_variable_index( "got_activated" );
