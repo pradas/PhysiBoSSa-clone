@@ -129,11 +129,11 @@
 				
 			</physical_parameter_set>
 			<initial_condition units="mmHg">0.5</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="false">0.5</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">0.5</Dirichlet_boundary_condition>
 		</variable>
 
 		<options>
-			<calculate_gradients>false</calculate_gradients>
+			<calculate_gradients>true</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
