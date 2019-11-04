@@ -161,6 +161,10 @@
 		<secretion_tnf type="double" units="dimensionless">0.1</secretion_tnf>
 		<threshold_tnf type="double" units="dimensionless">2.8e-05</threshold_tnf>
 
+		<concentration_tnf type="double" units=""> 0.5 </concentration_tnf>
+		<membrane_length type="int" units=""> 470 </membrane_length>
+
+
 	</user_parameters>
 	
 	

@@ -120,6 +120,11 @@ int main( int argc, char* argv[] )
 	
 	setup_tissue();
 
+	bool end_time_tnf = false;
+	double tputtnf = parameters.doubles("time_add_tnf");
+	double ttnf_next = parameters.doubles("duration_add_tnf");
+	double concentration_tnf = parameters.doubles("concentration_tnf") *= microenvironment.voxels(0).volume * 0.000001;
+
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
@@ -212,6 +217,26 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/			
 			
+			if ( PhysiCell_globals.current_time > tputtnf )
+			{
+				ttnf_next = PhysiCell_globals.current_time + parameters.doubles("duration_add_tnf");
+				tputtnf += parameters.doubles("time_add_tnf");
+			}
+			if ( PhysiCell_globals.current_time > parameters.doubles("time_remove_tnf") )
+			{
+				int k = microenvironment.find_density_index("tnf");
+				if ( k >= 0 )
+					remove_density(k);
+				parameters.doubles("time_remove_tnf") += PhysiCell_settings.max_time;
+			}
+
+			if ( PhysiCell_globals.current_time < ttnf_next )
+			{
+				int k = microenvironment.find_density_index("tnf");
+				if ( k >= 0 ) 
+					inject_density(k, concentration_tnf);
+			}
+
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 
@@ -241,4 +266,28 @@ int main( int argc, char* argv[] )
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 
 	return 0; 
+}
+
+void remove_density( int density_index )
+{	
+	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		microenvironment.density_vector(n)[density_index] = 0; 	
+	}
+}
+
+double norm(double cent[3]){ 
+	return sqrt( cent[0]*cent[0] + cent[1]*cent[1] + cent[2]*cent[2] ); 
+}
+
+void inject_density(int density_index, double concentration) 
+{
+	// Inject given concentration on the extremities only
+	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		double cent[3] = {microenvironment.voxels(n).center[0], microenvironment.voxels(n).center[1], microenvironment.voxels(n).center[2]};
+
+		if ( ! ((parameters.doubles("membrane_length") - norm(cent)) > 0) )
+			microenvironment.density_vector(n)[density_index] = concentration; 	
+	}
 }
