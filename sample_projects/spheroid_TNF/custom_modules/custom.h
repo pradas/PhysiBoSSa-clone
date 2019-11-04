@@ -85,8 +85,6 @@ void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, d
 
 // any additional cell types (beyond cell_defaults)
 
-extern Cell_Definition motile_cell; 
-
 // custom cell phenotype functions could go here 
 void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt );
 

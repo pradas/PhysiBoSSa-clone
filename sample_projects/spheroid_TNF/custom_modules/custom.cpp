@@ -69,8 +69,6 @@
 
 // declare cell definitions here 
 
-Cell_Definition motile_cell; 
-
 void create_cell_types( void )
 {
 	// use the same random seed so that future experiments have the 
