@@ -367,3 +367,27 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 		pCell->set_internal_uptake_constants(dt);
 	}
 }
+
+void remove_density( int density_index )
+{	
+	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		microenvironment.density_vector(n)[density_index] = 0; 	
+	}
+}
+
+double norm(double cent[3]){ 
+	return sqrt( cent[0]*cent[0] + cent[1]*cent[1] + cent[2]*cent[2] ); 
+}
+
+void inject_density(int density_index, double concentration) 
+{
+	// Inject given concentration on the extremities only
+	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		double cent[3] = {microenvironment.voxels(n).center[0], microenvironment.voxels(n).center[1], microenvironment.voxels(n).center[2]};
+
+		if ( ! ((parameters.doubles("membrane_length") - norm(cent)) > 0) )
+			microenvironment.density_vector(n)[density_index] = concentration; 	
+	}
+}
