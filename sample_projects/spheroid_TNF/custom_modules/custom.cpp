@@ -117,9 +117,6 @@ void create_cell_types( void )
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
-	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
-	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
-
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
@@ -316,8 +313,10 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 /* Go to proliferative if needed */
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	int Ki67_negative_index = Ki67_advanced.find_phase_index(PhysiCell_constants::Ki67_negative);
+
 	// If cells is in G0 (quiescent)
-	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
+	if ( pCell->phenotype.cycle.current_phase_index() == Ki67_negative_index )
 	{
 		// switch to pre-mitotic phase
 		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
