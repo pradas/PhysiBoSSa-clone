@@ -338,14 +338,16 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	bn_index = maboss->get_node_index( "Apoptosis" );
 	if ( bn_index != -1 && nodes[bn_index] )
 	{
-		pCell->start_death(PhysiCell_constants::apoptosis_death_model);
+		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
+		pCell->start_death(apoptosis_model_index);
 		return;
 	}
 
 	bn_index = maboss->get_node_index( "NonACD" );
 	if ( bn_index != -1 && nodes[bn_index] )
 	{
-		pCell->start_death(PhysiCell_constants::necrosis_death_model);
+		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
+		pCell->start_death(necrosis_model_index);
 		return;
 	}
 
