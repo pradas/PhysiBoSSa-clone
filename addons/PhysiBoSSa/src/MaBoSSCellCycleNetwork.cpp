@@ -40,7 +40,7 @@ void CellCycleNetwork::set_time_to_update()
 /* Update MaboSS network states */
 void CellCycleNetwork::run_maboss()
 {
-	#pragma omp critical
+	//#pragma omp critical
 	{
 		maboss->run(&networkState, &nodes);
 	}
