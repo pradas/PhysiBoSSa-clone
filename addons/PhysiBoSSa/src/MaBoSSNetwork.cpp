@@ -135,13 +135,14 @@ void MaBoSSNetwork::loadSymbol( int cellline )
 }
 
 /* Run the current network */
-bool MaBoSSNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val)
+bool MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 {
 	runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
 
 	// Load network state and values of current cell in the network instance
 	//loadSymbol( cellline );
-	load( netStates, nodes_val );
+	NetworkState netStates;
+	load( &netStates, nodes_val );
 	MaBEstEngine mabossEngine( network, runConfig );
 	// No output from MaBoSS run
 	std::ostream* os = NULL; 
@@ -152,7 +153,7 @@ bool MaBoSSNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val)
 	const STATE_MAP<NetworkState_Impl, double>& states = mabossEngine.getAsymptoticStateDist();
 	if (states.begin() != states.end()) 
 	{
-		(*netStates) = states.begin()->first;
+		netStates = states.begin()->first;
 	}
 	bool converged = true;	
 	/**if ( ! mabossEngine.converges() )
@@ -165,7 +166,7 @@ bool MaBoSSNetwork::run( NetworkState* netStates, std::vector<bool>* nodes_val)
 	std::vector<Node*> node3 = network->getNodes();
 	for ( auto node: node3 )
 	{
-		(*nodes_val)[i] = netStates->getNodeState( node ) ;
+		(*nodes_val)[i] = netStates.getNodeState( node ) ;
 		//std::cout << node->getLabel() << " " << (*nodes_val)[i] << std::endl;
 		i ++;
 	}

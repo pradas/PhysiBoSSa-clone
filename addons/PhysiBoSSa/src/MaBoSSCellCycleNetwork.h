@@ -27,10 +27,6 @@ class CellCycleNetwork
 			/** \brief Vector of nodes state current value (0 or 1) */
 			std::vector<bool> nodes;
 
-			/** \brief Current state of the network (MaBoSS object) */
-			NetworkState networkState;
-
-
 			/** \brief time left before to update it again */
 			double time_to_update;
 
