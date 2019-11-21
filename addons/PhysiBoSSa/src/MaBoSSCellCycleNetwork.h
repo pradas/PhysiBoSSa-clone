@@ -33,8 +33,6 @@ class CellCycleNetwork
 	protected:
 
 	public:
-		/** \brief Default constructor */
-		CellCycleNetwork();
 		/** \brief Constructor with given network instance */
 		CellCycleNetwork( MaBoSSNetwork* mboss);
 		/** \brief Class destructor */
@@ -47,16 +45,10 @@ class CellCycleNetwork
 		/** \brief Initialization: set network 
 		 *
 		 * @param mboss reference to the common object handling MaBoSS runs */
-		void set_maboss( MaBoSSNetwork* mboss );
+		void set_maboss( MaBoSSNetwork* maboss );
 		
 		/** \brief Update MaboSS network states */
 		void run_maboss();
-		
-		/** \brief Set inputs of the network from current cell state 
-		 *
-		 * For all possible input of MaBoSS network, check if each node is present in MaBoSS network, and if yes, specify its value according to current cell state or surrounding. \n
-		 * This is the function to change to add new network input nodes possible. */
-		void set_input_nodes();
 		
 		/** \brief choose a random update time, to asynchronize it between all cells 
 		 *

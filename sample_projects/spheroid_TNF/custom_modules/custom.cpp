@@ -202,7 +202,6 @@ void setup_tissue( void )
 	// create some cells near the origin
 	
 	Cell* pC;
-	MaBoSSNetwork* maboss;
 
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_filename"), ';', true);
 
@@ -214,8 +213,9 @@ void setup_tissue( void )
 
 		pC = create_cell(); 
 		pC->assign_position( x, y, z );
-		maboss = new MaBoSSNetwork();
-		maboss->init("./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd","./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+		MaBoSSNetwork* maboss = new MaBoSSNetwork(
+			"./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd",
+			"./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
 		pC->maboss_cycle_network = new CellCycleNetwork(maboss);
 	}
 
@@ -224,12 +224,14 @@ void setup_tissue( void )
 
 void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 {
-	std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
-	set_input_nodes(pCell, nodes);
+	if (pCell->maboss_cycle_network != NULL) {
+		std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
+		set_input_nodes(pCell, nodes);
 
-	pCell->maboss_cycle_network->run_maboss();
+		pCell->maboss_cycle_network->run_maboss();
 
-	from_nodes_to_cell(pCell, phenotype, dt);
+		from_nodes_to_cell(pCell, phenotype, dt);
+	}
 }
 
 void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
@@ -326,7 +328,6 @@ void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-
 	MaBoSSNetwork* maboss = pCell->maboss_cycle_network->get_maboss();
 	std::vector<bool> &nodes = *pCell->maboss_cycle_network->get_nodes();
 
@@ -339,6 +340,8 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
+		delete pCell->maboss_cycle_network;
+		pCell->maboss_cycle_network = NULL;
 		return;
 	}
 
@@ -347,6 +350,8 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	{
 		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
 		pCell->start_death(necrosis_model_index);
+		delete pCell->maboss_cycle_network;
+		pCell->maboss_cycle_network = NULL;
 		return;
 	}
 

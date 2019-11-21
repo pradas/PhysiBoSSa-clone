@@ -29,6 +29,9 @@ class MaBoSSNetwork
 		std::string conffile;
 
 		/** \brief Name of input configuration file */
+		std::string networkfile;
+
+		/** \brief Name of input configuration file */
 		std::string model_id;
 
 		/** \brief Time step to update the cycle */
@@ -50,12 +53,10 @@ class MaBoSSNetwork
 
 	public:
 		/** \brief Constructor */
-		MaBoSSNetwork();
+		MaBoSSNetwork( std::string networkFile, std::string configFile );
 		/** \brief Destructor */
 		~MaBoSSNetwork();
 
-		/** \brief Initialize the network from input files */
-		void init( std::string networkFile, std::string configFile );
 		/** \brief Read and load nodes initial states */
 		void initNetworkState();
 
@@ -82,13 +83,10 @@ class MaBoSSNetwork
 		 * Otherwise put new network states in input netStates
 		 * cellline: index of current cell_line for specific properties (rates) 
 		 * */
-		bool run(std::vector<bool>* nodes_val);
+		void run(std::vector<bool>* nodes_val);
 		
 		/** \brief Load previous network states and inputs */
 		void load( NetworkState* netState, std::vector<bool>* inputs );
-
-		/** \brief Load symbol rates value if they are in the map for the current cell line */
-		void loadSymbol( int cellline );
 
 		/** \brief Return node of given name current value
 		 *
@@ -96,10 +94,6 @@ class MaBoSSNetwork
 		 * Return 0 if node is 0 \n
 		 * Return 1 if node is 1 */
 		int get_node_index( std::string name );
-
-		void set_model_id(std::string);
-
-		std::string get_model_id();
 };
 
 #endif

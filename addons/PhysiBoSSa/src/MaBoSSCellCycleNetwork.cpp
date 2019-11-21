@@ -1,49 +1,37 @@
 #include "MaBoSSCellCycleNetwork.h"
 
-
-CellCycleNetwork::CellCycleNetwork()
+CellCycleNetwork::CellCycleNetwork( MaBoSSNetwork* maboss )
 {
-	this->time_to_update = 0;
-	this->maboss = nullptr;
-}
-
-CellCycleNetwork::CellCycleNetwork( MaBoSSNetwork* mboss )
-{
-	this->set_maboss( mboss );
+	this->set_maboss( maboss );
 	this->time_to_update = ( 1 + 0.5*UniformRandom11() ) * maboss->update_time_step();
 }
 
 CellCycleNetwork::~CellCycleNetwork()
 {
-	// network will be freed from Simul class, here just pointer
-	if ( maboss )
-		maboss = nullptr;
+	delete this->maboss;
+	this->maboss = NULL;
 }
 
 /* Initialization: set network */
-void CellCycleNetwork::set_maboss( MaBoSSNetwork* mboss )
+void CellCycleNetwork::set_maboss( MaBoSSNetwork* maboss )
 {
-	maboss = mboss;
-	set_time_to_update();
+	this->maboss = maboss;
+	this->set_time_to_update();
+
 	// initialize all nodes to 0
-	nodes.resize( maboss->number_of_nodes() );
-	maboss->initNetworkState();
-	maboss->set_default( &nodes );
+	this->nodes.resize( maboss->number_of_nodes() );
+	this->maboss->set_default( &this->nodes );
 }
 
 /* random update time, to asynchronize it between all cells */
 void CellCycleNetwork::set_time_to_update()
 {
-	time_to_update = (1 + 0.5*UniformRandom11()) * maboss->update_time_step();
+	this->time_to_update = (1 + 0.5*UniformRandom11()) * this->maboss->update_time_step();
 }
 
 /* Update MaboSS network states */
 void CellCycleNetwork::run_maboss()
 {
-	//#pragma omp critical
-	{
-		maboss->run(&nodes);
-	}
-	
-	set_time_to_update();
+	this->maboss->run(&this->nodes);
+	this->set_time_to_update();
 }

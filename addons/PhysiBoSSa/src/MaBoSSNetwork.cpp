@@ -1,7 +1,7 @@
 #include "MaBoSSNetwork.h"
 
 /* Default constructor */
-MaBoSSNetwork::MaBoSSNetwork()
+MaBoSSNetwork::MaBoSSNetwork( std::string networkFile, std::string configFile )
 {
 	// This is needed for the external functions
 	MaBEstEngine::init();
@@ -11,81 +11,40 @@ MaBoSSNetwork::MaBoSSNetwork()
 	this->symbTable = SymbolTable::getInstance();
 	this->update_time = 10;
 	this->def_nodes.clear();
-	this->conffile = "";
-	this->model_id = "";
+
+	this->network->parse(networkFile.c_str());
+	this->runConfig->parse(this->network, configFile.c_str());
+	
+	// This was missing, for some reason
+	this->network->updateRandomGenerator(RunConfig::getInstance());
+
+	this->initNetworkState();
 }
 
 /* Default destructor */
 MaBoSSNetwork::~MaBoSSNetwork()
 {
-	delete network;
-}
+	delete this->network;
+	delete this->runConfig;
+	delete this->symbTable;
 
-/* Set the name/id of the boolean model */
-void MaBoSSNetwork::set_model_id(std::string id)
-{
-	this->model_id = id;
-}
-
-/* Get the name/id of the boolean model */
-std::string MaBoSSNetwork::get_model_id()
-{
-	return this->model_id;
-}
-
-// TODO
-/* Read properties from XML parameter file for network */
-/*void MaBossNetwork::read_properties( ReadXML* reader, std::string what )
-{
-	reader->getDoubleValue( what, "network_update_step", &update_time );
-	
-	// Read mutations
-	int left = 1; // if has still some mutation to read
-	int next = 0; // number of mutation read so far
-	std::string sname = "";
-	double rate = 1;
-	int cl = 0;
-	while ( left )
-	{
-		left = reader->getStringValue( what, "symbol_name", &sname, "mutation_"+std::to_string(next) );
-		left *= reader->getDoubleValue( what, "rate", &rate, "mutation_"+std::to_string(next) );
-		left *= reader->getIntValue( what, "cell_line", &cl, "mutation_"+std::to_string(next) );
-		
-		// has succeed to read one other mutation, add it in the map
-		if ( left )
-		{
-			strip(&sname);
-			mbRates[std::pair<std::string, int>(sname, cl)] = rate;
-			next ++;
-		}
-	}
-}*/
-
-/* Initialize the network by reading input files */
-void MaBoSSNetwork::init( std::string networkFile, std::string configFile )
-{
-	network->parse(networkFile.c_str());
-	conffile = configFile;
-	runConfig->parse(network, conffile.c_str());
-	
-	// This was missing, for some reason
-	network->updateRandomGenerator(RunConfig::getInstance());
-	
-	initNetworkState();
+	this->network = NULL;
+	this->runConfig = NULL;
+	this->symbTable = NULL;
 }
 
 /* Initialize the state of the network */
 void MaBoSSNetwork::initNetworkState()
 {
 	NetworkState initial_state;
-	network->initStates(initial_state);
-	std::vector<Node *> nodes = network->getNodes();
+	this->network->initStates(initial_state);
+	std::vector<Node *> nodes = this->network->getNodes();
 	int i = 0;
-	def_nodes.resize( nodes.size() );
+	this->def_nodes.resize( nodes.size() );
 	for (auto node : nodes)
 	{
-		node_names[ node->getLabel() ] = i;
-		def_nodes[i] = initial_state.getNodeState(node);
+		this->node_names[ node->getLabel() ] = i;
+		this->def_nodes[i] = initial_state.getNodeState(node);
 		i++;	
 	}
 }
@@ -93,9 +52,9 @@ void MaBoSSNetwork::initNetworkState()
 /* Set values of nodes to default values */
 void MaBoSSNetwork::set_default( std::vector<bool>* nodes )
 {
-	for ( int i = 0; i < (int) def_nodes.size(); i++ )
+	for ( int i = 0; i < (int)this->def_nodes.size(); i++ )
 	{
-		(*nodes)[i] = def_nodes[i];
+		(*nodes)[i] = this->def_nodes[i];
 	}
 }
 
@@ -115,35 +74,16 @@ void MaBoSSNetwork::load( NetworkState* netState, std::vector<bool>* inputs )
 	IStateGroup::setInitialState(network, netState);
 }
 
-/* Load symbol rates value if they are in the map for the current cell line, useful for mutations */
-void MaBoSSNetwork::loadSymbol( int cellline )
-{
-	for (auto symit = mbRates.begin(); symit != mbRates.end(); symit++ )
-	{
-		// current cell line, keep it
-		if ( symit->first.second == cellline )
-		{
-			const Symbol* symb = symbTable->getSymbol( symit->first.first );
-			if ( symb != NULL )
-			{
-				symbTable->overrideSymbolValue( symb, symit->second );
-				//std::cout << symit->second << " " << symit->first.first << " " << symit->first.second << std::endl;
-			}
-		}
-
-	}
-}
-
 /* Run the current network */
-bool MaBoSSNetwork::run(std::vector<bool>* nodes_val)
+void MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 {
-	runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
+	this->runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
 
 	// Load network state and values of current cell in the network instance
 	//loadSymbol( cellline );
 	NetworkState netStates;
 	load( &netStates, nodes_val );
-	MaBEstEngine mabossEngine( network, runConfig );
+	MaBEstEngine mabossEngine( this->network, this->runConfig );
 	// No output from MaBoSS run
 	std::ostream* os = NULL; 
 	// And run it
@@ -155,31 +95,22 @@ bool MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 	{
 		netStates = states.begin()->first;
 	}
-	bool converged = true;	
-	/**if ( ! mabossEngine.converges() )
-	{
-		std::cerr << "WARNING: Network did not converge;" << std::endl;
-//		converged = false;
-	}*/
 
 	int i = 0;
-	std::vector<Node*> node3 = network->getNodes();
-	for ( auto node: node3 )
+	std::vector<Node*> nodes = this->network->getNodes();
+	for ( auto node: nodes )
 	{
 		(*nodes_val)[i] = netStates.getNodeState( node ) ;
 		//std::cout << node->getLabel() << " " << (*nodes_val)[i] << std::endl;
 		i ++;
 	}
-	//std::cout << std::endl;
-
-	return converged;
 }
 
 /* Print current state of all the nodes of the network */
 void MaBoSSNetwork::printNodes(NetworkState* netStates)
 {
-	std::vector<Node*> node3 = network->getNodes();
-	for ( auto node: node3 )
+	std::vector<Node*> nodes = network->getNodes();
+	for ( auto node: nodes )
 	{
 		std::cout << node->getLabel() << "=" << netStates->getNodeState(node) << "; ";
 	}
@@ -189,8 +120,8 @@ void MaBoSSNetwork::printNodes(NetworkState* netStates)
 /* Return the index of node based on node's name */
 int MaBoSSNetwork::get_node_index( std::string name )
 {
-	auto res = node_names.find(name);
-	if ( res != node_names.end() )
+	auto res = this->node_names.find(name);
+	if ( res != this->node_names.end() )
 		return res->second;
 	return -1;	
 }
