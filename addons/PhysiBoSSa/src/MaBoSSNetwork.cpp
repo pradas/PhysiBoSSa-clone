@@ -25,12 +25,7 @@ MaBoSSNetwork::MaBoSSNetwork( std::string networkFile, std::string configFile )
 MaBoSSNetwork::~MaBoSSNetwork()
 {
 	delete this->network;
-	delete this->runConfig;
-	delete this->symbTable;
-
 	this->network = NULL;
-	this->runConfig = NULL;
-	this->symbTable = NULL;
 }
 
 /* Initialize the state of the network */
