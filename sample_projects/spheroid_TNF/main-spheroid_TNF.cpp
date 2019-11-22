@@ -121,9 +121,9 @@ int main( int argc, char* argv[] )
 	setup_tissue();
 
 	bool end_time_tnf = false;
-	double tputtnf = parameters.doubles("time_add_tnf");
-	double ttnf_next = parameters.doubles("duration_add_tnf");
-	double concentration_tnf = parameters.doubles("concentration_tnf") *= microenvironment.voxels(0).volume * 0.000001;
+	double tputtnf = parameters.ints("time_add_tnf");
+	double ttnf_next = parameters.ints("duration_add_tnf");
+	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -219,15 +219,15 @@ int main( int argc, char* argv[] )
 			
 			if ( PhysiCell_globals.current_time > tputtnf )
 			{
-				ttnf_next = PhysiCell_globals.current_time + parameters.doubles("duration_add_tnf");
-				tputtnf += parameters.doubles("time_add_tnf");
+				ttnf_next = PhysiCell_globals.current_time + parameters.ints("duration_add_tnf");
+				tputtnf += parameters.ints("time_add_tnf");
 			}
-			if ( PhysiCell_globals.current_time > parameters.doubles("time_remove_tnf") )
+			if ( PhysiCell_globals.current_time > parameters.ints("time_remove_tnf") )
 			{
 				int k = microenvironment.find_density_index("tnf");
 				if ( k >= 0 )
 					remove_density(k);
-				parameters.doubles("time_remove_tnf") += PhysiCell_settings.max_time;
+				parameters.ints("time_remove_tnf") += PhysiCell_settings.max_time;
 			}
 
 			if ( PhysiCell_globals.current_time < ttnf_next )
