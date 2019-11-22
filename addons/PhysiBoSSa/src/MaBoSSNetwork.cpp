@@ -65,7 +65,6 @@ void MaBoSSNetwork::load( NetworkState* netState, std::vector<bool>* inputs )
 		ind ++;
 	}
 
-	// IStateGroup::reset();
 	IStateGroup::setInitialState(network, netState);
 }
 
@@ -75,7 +74,6 @@ void MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 	this->runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
 
 	// Load network state and values of current cell in the network instance
-	//loadSymbol( cellline );
 	NetworkState netStates;
 	load( &netStates, nodes_val );
 	MaBEstEngine mabossEngine( this->network, this->runConfig );
