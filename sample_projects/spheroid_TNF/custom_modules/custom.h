@@ -106,6 +106,7 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
+void from_nodes_to_cell_debug(Cell* pCell, Phenotype& phenotype, double dt);
 
 void remove_density( int density_index );
 double norm(double cent[3]);

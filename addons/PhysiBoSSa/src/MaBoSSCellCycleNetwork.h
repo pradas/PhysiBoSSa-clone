@@ -38,7 +38,7 @@ class CellCycleNetwork
 		/** \brief Class destructor */
 		~CellCycleNetwork();
 
-		inline std::vector<bool> * get_nodes() {return &nodes;}
+		inline std::vector<bool>* get_nodes() {return &nodes;}
 
 		inline MaBoSSNetwork* get_maboss() {return maboss;}
 

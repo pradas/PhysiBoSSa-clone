@@ -90,7 +90,7 @@ void create_cell_types( void )
 	
 	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = Ki67_advanced; 
+	cell_defaults.functions.cycle_model = live; 
 	
 	// set default_cell_functions; 
 	
@@ -118,6 +118,15 @@ void create_cell_types( void )
 	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
 	// initially no necrosis 
+	int live_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::live);
+	cell_defaults.phenotype.cycle.pCycle_Model->transition_rate(live_index, live_index) = 1 / parameters.doubles("live_phase_duration");
+	
+	Cycle_Model* apoptosis_model = cell_defaults.phenotype.death.models[apoptosis_model_index];
+	int apoptotic_index = apoptosis_model->find_phase_index(PhysiCell_constants::apoptotic);
+	int debris_index = apoptosis_model->find_phase_index(PhysiCell_constants::debris);
+	apoptosis_model->transition_rate(apoptotic_index, debris_index) = 1 / parameters.doubles("apoptotic_duration");
+
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; // 1/parameters.doubles("apoptotic_rate"); 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// set oxygen uptake / secretion parameters for the default cell type 
@@ -125,31 +134,32 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 40; 
 
-	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = 0.0025; 
-	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0.0; 
+	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = parameters.doubles("tnf_uptake_rate"); 
+	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = parameters.doubles("tnf_secretion_rate");
 	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 0.5; 
 	
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
 
-	cell_defaults.phenotype.motility.migration_bias = 0.1;
-	cell_defaults.phenotype.motility.migration_speed = 0.01;
-	cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 2.0;
-	cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 10.0;
+	cell_defaults.phenotype.motility.migration_bias = parameters.doubles("migration_bias");
+	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("migration_speed");
+	cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cell_cell_adhesion_strength");
+	cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("cell_cell_repulsion_strength");
 
-	cell_defaults.parameters.o2_necrosis_threshold = 0;
-	cell_defaults.parameters.o2_proliferation_threshold = 0;
-	cell_defaults.parameters.o2_hypoxic_threshold = 40;
-	cell_defaults.parameters.o2_reference = 40;
-	cell_defaults.parameters.o2_proliferation_saturation = 40;
-
-	cell_defaults.phenotype.geometry.radius = 8.413;
-	cell_defaults.phenotype.geometry.nuclear_radius = 5.052;
-	cell_defaults.phenotype.volume.fluid_fraction = 0.75;
-	cell_defaults.phenotype.volume.nuclear_solid = 135;
-	cell_defaults.phenotype.volume.cytoplasmic_solid = 486;
-	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = 3.6;
+	cell_defaults.parameters.max_necrosis_rate = parameters.doubles("max_necrosis_rate");
+	cell_defaults.parameters.o2_necrosis_max = parameters.doubles("o2_necrosis_max");
+	cell_defaults.parameters.o2_proliferation_threshold = parameters.doubles("o2_proliferation_threshold");
+	//cell_defaults.parameters.o2_hypoxic_threshold = parameters.doubles("o2_hypoxic_threshold");
+	cell_defaults.parameters.o2_reference = parameters.doubles("o2_reference");
+	cell_defaults.parameters.o2_proliferation_saturation = parameters.doubles("o2_proliferation_saturation");
 	
+	cell_defaults.phenotype.geometry.radius = parameters.doubles("radius");
+	cell_defaults.phenotype.geometry.nuclear_radius = parameters.doubles("nuclear_radius");
+	cell_defaults.phenotype.volume.fluid_fraction = parameters.doubles("fluid_fraction");
+	cell_defaults.phenotype.volume.nuclear_solid = parameters.doubles("nuclear_solid");
+	cell_defaults.phenotype.volume.cytoplasmic_solid = parameters.doubles("cytoplasmic_solid");
+	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = parameters.doubles("cytoplasmic_to_nuclear_ratio");
+
 	cell_defaults.custom_data.add_variable("got_activated", "", 0);
 
 	return; 
@@ -203,19 +213,19 @@ void setup_tissue( void )
 	
 	Cell* pC;
 
-	std::vector<init_record> cells = read_init_file(parameters.strings("init_filename"), ';', true);
-
-	for (int i = 0; i < cells.size(); i++)
+	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
+	std::string bnd_file = parameters.strings("bnd_file");
+	std::string cfg_file = parameters.strings("cfg_file");
+	// TESTING PURPOSES **********************************************
+	for (int i = 0; i < 2/*cells.size()*/; i++)
 	{
 		int x = cells[i].x;
 		int y = cells[i].y;
-		int z = cells[i].z;
+		int z = 0;//cells[i].z;
 
 		pC = create_cell(); 
 		pC->assign_position( x, y, z );
-		MaBoSSNetwork* maboss = new MaBoSSNetwork(
-			"./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd",
-			"./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg");
+		MaBoSSNetwork* maboss = new MaBoSSNetwork(bnd_file, cfg_file);
 		pC->maboss_cycle_network = new CellCycleNetwork(maboss);
 	}
 
@@ -230,7 +240,7 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 
 		pCell->maboss_cycle_network->run_maboss();
 
-		from_nodes_to_cell(pCell, phenotype, dt);
+		from_nodes_to_cell_debug(pCell, phenotype, dt);
 	}
 }
 
@@ -241,7 +251,7 @@ void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
 
 	if (tnf_maboss_index != -1 && tnf_substrate_index != -1)
 	{
-		nodes->at(tnf_maboss_index) = (pCell->internalized_substrates->at(tnf_substrate_index) > parameters.doubles("threshold_tnf"));
+		(*nodes)[tnf_maboss_index] = (*pCell->internalized_substrates)[tnf_substrate_index] > parameters.doubles("tnf_threshold");
 	}
 }
 
@@ -315,28 +325,36 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 /* Go to proliferative if needed */
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	int Ki67_negative_index = Ki67_advanced.find_phase_index(PhysiCell_constants::Ki67_negative);
+	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live );
+}
 
-	// If cells is in G0 (quiescent)
-	if ( pCell->phenotype.cycle.current_phase_index() == Ki67_negative_index )
-	{
-		// switch to pre-mitotic phase
-		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
-		pCell->phenotype.volume.target_solid_nuclear *= 2.0;
+void from_nodes_to_cell_debug(Cell* pCell, Phenotype& phenotype, double dt)
+{
+	if(pCell->index == 0){
+		do_proliferation( pCell, phenotype, dt );
 	}
+	else if(pCell->index == 1 && !pCell->phenotype.death.dead)
+	{
+		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
+		pCell->start_death(apoptosis_model_index);
+		delete pCell->maboss_cycle_network;
+		pCell->maboss_cycle_network = NULL;
+	}
+	
+	
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
 	MaBoSSNetwork* maboss = pCell->maboss_cycle_network->get_maboss();
-	std::vector<bool> &nodes = *pCell->maboss_cycle_network->get_nodes();
+	std::vector<bool>* nodes = pCell->maboss_cycle_network->get_nodes();
 
 	int bn_index = maboss->get_node_index( "Survival" );
-	if ( bn_index != -1 && nodes[bn_index])
+	if ( bn_index != -1 && (*nodes)[bn_index])
 		do_proliferation( pCell, phenotype, dt );
 
 	bn_index = maboss->get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && nodes[bn_index] )
+	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
@@ -346,7 +364,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	}
 
 	bn_index = maboss->get_node_index( "NonACD" );
-	if ( bn_index != -1 && nodes[bn_index] )
+	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
 		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
 		pCell->start_death(necrosis_model_index);
@@ -361,7 +379,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	{
 		int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 		// produce some TNF
-		if ( nodes[bn_index] )
+		if ( (*nodes)[bn_index] )
 		{
 			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = parameters.doubles("secretion_tnf")/microenvironment.voxels(pCell->get_current_voxel_index()).volume;
 			int activated_index = pCell->custom_data.find_variable_index( "got_activated" );
