@@ -119,14 +119,14 @@ void create_cell_types( void )
 
 	// initially no necrosis 
 	int live_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::live);
-	cell_defaults.phenotype.cycle.pCycle_Model->transition_rate(live_index, live_index) = 1 / parameters.doubles("live_phase_duration");
+	cell_defaults.phenotype.cycle.data.transition_rate(live_index, live_index) = parameters.doubles("live_phase_duration");
 	
 	Cycle_Model* apoptosis_model = cell_defaults.phenotype.death.models[apoptosis_model_index];
 	int apoptotic_index = apoptosis_model->find_phase_index(PhysiCell_constants::apoptotic);
 	int debris_index = apoptosis_model->find_phase_index(PhysiCell_constants::debris);
-	apoptosis_model->transition_rate(apoptotic_index, debris_index) = 1 / parameters.doubles("apoptotic_duration");
+	apoptosis_model->transition_rate(apoptotic_index, debris_index) = parameters.doubles("apoptotic_duration");
 
-	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; // 1/parameters.doubles("apoptotic_rate"); 
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] = parameters.doubles("apoptotic_rate"); 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// set oxygen uptake / secretion parameters for the default cell type 
@@ -149,6 +149,7 @@ void create_cell_types( void )
 	cell_defaults.parameters.max_necrosis_rate = parameters.doubles("max_necrosis_rate");
 	cell_defaults.parameters.o2_necrosis_max = parameters.doubles("o2_necrosis_max");
 	cell_defaults.parameters.o2_proliferation_threshold = parameters.doubles("o2_proliferation_threshold");
+	//not implemented in physiboss
 	//cell_defaults.parameters.o2_hypoxic_threshold = parameters.doubles("o2_hypoxic_threshold");
 	cell_defaults.parameters.o2_reference = parameters.doubles("o2_reference");
 	cell_defaults.parameters.o2_proliferation_saturation = parameters.doubles("o2_proliferation_saturation");
@@ -216,12 +217,11 @@ void setup_tissue( void )
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
 	std::string bnd_file = parameters.strings("bnd_file");
 	std::string cfg_file = parameters.strings("cfg_file");
-	// TESTING PURPOSES **********************************************
-	for (int i = 0; i < 2/*cells.size()*/; i++)
+	for (int i = 0; i < cells.size(); i++)
 	{
 		int x = cells[i].x;
 		int y = cells[i].y;
-		int z = 0;//cells[i].z;
+		int z = cells[i].z;
 
 		pC = create_cell(); 
 		pC->assign_position( x, y, z );
@@ -240,7 +240,7 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 
 		pCell->maboss_cycle_network->run_maboss();
 
-		from_nodes_to_cell_debug(pCell, phenotype, dt);
+		from_nodes_to_cell(pCell, phenotype, dt);
 	}
 }
 
@@ -325,23 +325,7 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 /* Go to proliferative if needed */
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live );
-}
-
-void from_nodes_to_cell_debug(Cell* pCell, Phenotype& phenotype, double dt)
-{
-	if(pCell->index == 0){
-		do_proliferation( pCell, phenotype, dt );
-	}
-	else if(pCell->index == 1 && !pCell->phenotype.death.dead)
-	{
-		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
-		pCell->start_death(apoptosis_model_index);
-		delete pCell->maboss_cycle_network;
-		pCell->maboss_cycle_network = NULL;
-	}
-	
-	
+	//do nothing
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)

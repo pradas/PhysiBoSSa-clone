@@ -126,8 +126,8 @@
 		
 		<variable name="tnf" units="mmHg" ID="1">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate> 
+				<diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient>
+				<decay_rate units="1/min">.0275</decay_rate> 
 			</physical_parameter_set>
 			<initial_condition units="mmHg">0.5</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">0.5</Dirichlet_boundary_condition>
@@ -189,9 +189,9 @@
 
 		<membrane_length type="int" units=""> 470 </membrane_length>
 
-		<live_phase_duration type="double" units=""> 14 </live_phase_duration>
-		<apoptotic_duration type="double" units=""> 516 </apoptotic_duration>
-		<apoptotic_rate type="double" units=""> 240 </apoptotic_rate>
+		<live_phase_duration type="double" units=""> 0.000974658869396 </live_phase_duration>
+		<apoptotic_duration type="double" units=""> 0.00271002710027 </apoptotic_duration>
+		<apoptotic_rate type="double" units="">  0.0000175 </apoptotic_rate>
 
 	</user_parameters>
 	
