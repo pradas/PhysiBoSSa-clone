@@ -187,9 +187,9 @@
 
 		<membrane_length type="int" units=""> 470 </membrane_length>
 
-		<live_phase_duration type="double" units=""> 0.000974658869396 </live_phase_duration>
-		<apoptotic_duration type="double" units=""> 0.00271002710027 </apoptotic_duration>
-		<apoptotic_rate type="double" units="">  0.0000175 </apoptotic_rate>
+		<live_phase_duration type="double" units="1/min"> 0.000974658869396 </live_phase_duration>
+		<apoptotic_duration type="double" units="1/min"> 0.00271002710027 </apoptotic_duration>
+		<apoptotic_rate type="double" units="1/min">  0.0000175 </apoptotic_rate>
 
 	</user_parameters>
 	

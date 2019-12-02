@@ -147,7 +147,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = false_cell_coloring_live_dead;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -216,7 +216,8 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/			
-			
+			/*
+			//From now, tnf inyection is omited
 			if ( PhysiCell_globals.current_time > tputtnf )
 			{
 				ttnf_next = PhysiCell_globals.current_time + parameters.ints("duration_add_tnf");
@@ -236,7 +237,7 @@ int main( int argc, char* argv[] )
 				if ( k >= 0 ) 
 					inject_density(k, concentration_tnf);
 			}
-
+			*/
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 
