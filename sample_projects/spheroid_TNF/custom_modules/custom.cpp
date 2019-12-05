@@ -135,7 +135,7 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 40; 
 
 	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = parameters.doubles("tnf_uptake_rate"); 
-	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = parameters.doubles("tnf_secretion_rate");
+	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
 	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 0.5; 
 	
 	// add custom data here, if any 
@@ -160,8 +160,6 @@ void create_cell_types( void )
 	cell_defaults.phenotype.volume.nuclear_solid = parameters.doubles("nuclear_solid");
 	cell_defaults.phenotype.volume.cytoplasmic_solid = parameters.doubles("cytoplasmic_solid");
 	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = parameters.doubles("cytoplasmic_to_nuclear_ratio");
-
-	cell_defaults.custom_data.add_variable("got_activated", "", 0);
 
 	return; 
 }
@@ -245,13 +243,14 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 }
 
 void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
-	
 	int tnf_maboss_index = pCell->maboss_cycle_network->get_maboss()->get_node_index("TNF");
-	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+
+	static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
 	if (tnf_maboss_index != -1 && tnf_substrate_index != -1)
 	{
-		(*nodes)[tnf_maboss_index] = (*pCell->internalized_substrates)[tnf_substrate_index] > parameters.doubles("tnf_threshold");
+		(*nodes)[tnf_maboss_index] = pCell->phenotype.molecular.internalized_total_substrates[tnf_substrate_index] > tnf_threshold;
 	}
 }
 
@@ -333,6 +332,8 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	MaBoSSNetwork* maboss = pCell->maboss_cycle_network->get_maboss();
 	std::vector<bool>* nodes = pCell->maboss_cycle_network->get_nodes();
 
+	static double tnf_secretion = parameters.doubles("tnf_secretion_rate");
+
 	int bn_index = maboss->get_node_index( "Survival" );
 	if ( bn_index != -1 && (*nodes)[bn_index])
 		do_proliferation( pCell, phenotype, dt );
@@ -365,10 +366,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 		// produce some TNF
 		if ( (*nodes)[bn_index] )
 		{
-			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = parameters.doubles("secretion_tnf")/microenvironment.voxels(pCell->get_current_voxel_index()).volume;
-			int activated_index = pCell->custom_data.find_variable_index( "got_activated" );
-			if ( pCell->custom_data[activated_index] == 0 )
-				pCell->custom_data[activated_index] = 1;
+			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume;
 		}
 		else
 			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
