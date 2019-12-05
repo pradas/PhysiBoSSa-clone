@@ -130,7 +130,7 @@
 				<decay_rate units="1/min">.0275</decay_rate> 
 			</physical_parameter_set>
 			<initial_condition units="mmHg">0.5</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="false">0.5</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">0.0</Dirichlet_boundary_condition>
 		</variable>
 
 		<options>

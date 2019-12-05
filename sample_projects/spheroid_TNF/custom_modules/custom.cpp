@@ -380,6 +380,7 @@ void remove_density( int density_index )
 	{
 		microenvironment.density_vector(n)[density_index] = 0; 	
 	}
+	std::cout << "Removal done" << std::endl;
 }
 
 double norm(double cent[3]){ 
@@ -388,12 +389,15 @@ double norm(double cent[3]){
 
 void inject_density(int density_index, double concentration) 
 {
+	//static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+	double membrane_lenght = parameters.doubles("membrane_length");
 	// Inject given concentration on the extremities only
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
+		//microenvironment.update_dirichlet_node(n, tnf_substrate_index, 0.5);
 		double cent[3] = {microenvironment.voxels(n).center[0], microenvironment.voxels(n).center[1], microenvironment.voxels(n).center[2]};
 
-		if ( ! ((parameters.doubles("membrane_length") - norm(cent)) > 0) )
+		if ( ! ((membrane_lenght - norm(cent)) > 0) )
 			microenvironment.density_vector(n)[density_index] = concentration; 	
 	}
 }
