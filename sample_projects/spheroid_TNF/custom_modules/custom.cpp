@@ -110,14 +110,13 @@ void create_cell_types( void )
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 
 	// set the rate terms in the default phenotype 
-
 	// first find index for a few key variables. 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
-	// initially no necrosis 
+	// set live duration, apoptotic duration and rate and initially no necrosis 
 	int live_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::live);
 	cell_defaults.phenotype.cycle.data.transition_rate(live_index, live_index) = parameters.doubles("live_phase_duration");
 	
@@ -132,7 +131,7 @@ void create_cell_types( void )
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 40; 
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
 
 	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = parameters.doubles("tnf_uptake_rate"); 
 	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
@@ -141,6 +140,7 @@ void create_cell_types( void )
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
 
+	/*
 	cell_defaults.phenotype.motility.migration_bias = parameters.doubles("migration_bias");
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("migration_speed");
 	cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cell_cell_adhesion_strength");
@@ -160,7 +160,7 @@ void create_cell_types( void )
 	cell_defaults.phenotype.volume.nuclear_solid = parameters.doubles("nuclear_solid");
 	cell_defaults.phenotype.volume.cytoplasmic_solid = parameters.doubles("cytoplasmic_solid");
 	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = parameters.doubles("cytoplasmic_to_nuclear_ratio");
-
+	*/
 	return; 
 }
 
@@ -208,8 +208,6 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	// create some cells near the origin
-	
 	Cell* pC;
 
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
@@ -232,6 +230,12 @@ void setup_tissue( void )
 
 void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 {
+    if( phenotype.death.dead == true )
+    {
+        pCell->functions.update_phenotype = NULL;
+        return;
+    }
+	
 	if (pCell->maboss_cycle_network != NULL) {
 		std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
 		set_input_nodes(pCell, nodes);
@@ -244,7 +248,6 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 
 void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
 	int tnf_maboss_index = pCell->maboss_cycle_network->get_maboss()->get_node_index("TNF");
-
 	static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
@@ -254,14 +257,12 @@ void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
 	}
 }
 
+//NOT USED
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// start with flow cytometry coloring 
-	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
-	
 	// if the cell is motile and not dead, paint it black 
-	
 	if( pCell->phenotype.death.dead == false && 
 		pCell->type == 1 )
 	{
@@ -274,7 +275,6 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
 { 
-
 	// File pointer 
 	std::fstream fin; 
 	std::vector<init_record> result;
@@ -324,7 +324,7 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 /* Go to proliferative if needed */
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	//do nothing
+	//do nothing as live model only have one phase
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
