@@ -11,11 +11,22 @@ ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
 
-### MaBoSS directory
+### MaBoSS configuration 
+# MaBoSS directory
 MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
 CUR_DIR = $(shell pwd)
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
-INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include
+INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include 
+
+# MaBoSS max nodes
+ifndef MABOSS_MAX_NODES
+MABOSS_MAX_NODES = 64
+endif
+
+# If max nodes > 64, change lib path 
+ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n -ldl
+endif
 
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
@@ -144,7 +155,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 MaBoSS:
-	cd $(MABOSS_DIR)/src && make clean && make install_alib
+	cd $(MABOSS_DIR)/src && make MAXNODES=$(MABOSS_MAX_NODES) install_alib
 
 MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
@@ -154,9 +165,6 @@ utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 
 MaBoSSCellCycleNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
-
-MaBoSS-clean:
-	cd $(MABOSS_DIR)/src && make clean
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
@@ -175,6 +183,9 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	rm -rf ./scripts
+
+MaBoSS-clean:
+	cd $(MABOSS_DIR)/src && make clean
 	
 clean: MaBoSS-clean
 	rm -f *.o
