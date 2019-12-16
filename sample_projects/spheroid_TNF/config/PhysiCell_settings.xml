@@ -105,7 +105,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">30</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -157,34 +157,15 @@
 		<bnd_file type="string" units="">./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd</bnd_file>
 		<cfg_file type="string" units="">./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg</cfg_file>
 
-		<migration_bias type="double" units=""> 0.1 </migration_bias>
-		<migration_speed type="double" units=""> 0.01 </migration_speed>
-		<cell_cell_adhesion_strength type="double" units="">2.0</cell_cell_adhesion_strength>
-		<cell_cell_repulsion_strength type="double" units="">10.0</cell_cell_repulsion_strength>
-
-		<max_necrosis_rate type="double" units="1/min">0.0</max_necrosis_rate>
-		<o2_necrosis_max type="double" units="mmHg">0.0</o2_necrosis_max>
-		<o2_proliferation_threshold type="double" units="mmHg">0.0</o2_proliferation_threshold>
-		<o2_hypoxic_threshold type="double" units="mmHg">40.0</o2_hypoxic_threshold>
-		<o2_reference type="double" units="mmHg">40.0</o2_reference>
-		<o2_proliferation_saturation type="double" units="mmHg">40.0</o2_proliferation_saturation>
-		
-		<radius type="double" units="μm">8.413</radius>
-		<nuclear_radius type="double" units="μm">5.052</nuclear_radius>
-		<fluid_fraction type="double" units="">0.75</fluid_fraction>
-		<nuclear_solid type="double" units="">135.0</nuclear_solid>
-		<cytoplasmic_solid type="double" units="">486.0</cytoplasmic_solid>
-		<cytoplasmic_to_nuclear_ratio type="double" units="">3.6</cytoplasmic_to_nuclear_ratio>
-
 		<tnf_uptake_rate type="double" units="">0.0025</tnf_uptake_rate>
-		<tnf_threshold type="double" units="dimensionless">2.8e-05</tnf_threshold>
 		<tnf_secretion_rate type="double" units="">0.1</tnf_secretion_rate>
 
 		<duration_add_tnf type="int" units="min">10</duration_add_tnf>
 		<time_remove_tnf type="int" units="min">8000</time_remove_tnf>
 		<time_add_tnf type="int" units="min">150</time_add_tnf>
-		<concentration_tnf type="double" units=""> 0.5 </concentration_tnf>
 
+		<tnf_threshold type="double" units="dimensionless">2.8e-05</tnf_threshold>
+		<concentration_tnf type="double" units=""> 0.5 </concentration_tnf>
 		<membrane_length type="int" units=""> 470 </membrane_length>
 
 		<live_phase_duration type="double" units="1/min"> 0.000974658869396 </live_phase_duration>

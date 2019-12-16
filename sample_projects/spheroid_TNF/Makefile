@@ -53,7 +53,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCellCycleNetwork.o
 
-PhysiCell_custom_module_OBJECTS := custom.o
+PhysiCell_custom_module_OBJECTS := custom.o custom_main.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -160,6 +160,9 @@ MaBoSS-clean:
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
+
+custom_main.o: ./custom_modules/custom_main.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom_main.cpp
 
 # cleanup
 

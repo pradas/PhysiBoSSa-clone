@@ -96,14 +96,6 @@ void create_cell_types( void )
 	
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
 	
-	// only needed for a 2-D simulation: 
-	
-	/*
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0;
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	*/
-	
 	// make sure the defaults are self-consistent. 
 	
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
@@ -140,67 +132,19 @@ void create_cell_types( void )
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
 
-	/*
-	cell_defaults.phenotype.motility.migration_bias = parameters.doubles("migration_bias");
-	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("migration_speed");
-	cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cell_cell_adhesion_strength");
-	cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("cell_cell_repulsion_strength");
-
-	cell_defaults.parameters.max_necrosis_rate = parameters.doubles("max_necrosis_rate");
-	cell_defaults.parameters.o2_necrosis_max = parameters.doubles("o2_necrosis_max");
-	cell_defaults.parameters.o2_proliferation_threshold = parameters.doubles("o2_proliferation_threshold");
-	//not implemented in physiboss
-	//cell_defaults.parameters.o2_hypoxic_threshold = parameters.doubles("o2_hypoxic_threshold");
-	cell_defaults.parameters.o2_reference = parameters.doubles("o2_reference");
-	cell_defaults.parameters.o2_proliferation_saturation = parameters.doubles("o2_proliferation_saturation");
-	
-	cell_defaults.phenotype.geometry.radius = parameters.doubles("radius");
-	cell_defaults.phenotype.geometry.nuclear_radius = parameters.doubles("nuclear_radius");
-	cell_defaults.phenotype.volume.fluid_fraction = parameters.doubles("fluid_fraction");
-	cell_defaults.phenotype.volume.nuclear_solid = parameters.doubles("nuclear_solid");
-	cell_defaults.phenotype.volume.cytoplasmic_solid = parameters.doubles("cytoplasmic_solid");
-	cell_defaults.phenotype.volume.cytoplasmic_to_nuclear_ratio = parameters.doubles("cytoplasmic_to_nuclear_ratio");
-	*/
 	return; 
 }
 
 void setup_microenvironment( void )
 {
-	// set domain parameters 
-	
-/*	
-	default_microenvironment_options.X_range = {-500, 500}; 
-	default_microenvironment_options.Y_range = {-500, 500}; 
-	default_microenvironment_options.Z_range = {-500, 500}; 
-*/	
 	// make sure to override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == true )
 	{
 		std::cout << "Warning: overriding XML config option and setting to 3D!" << std::endl; 
 		default_microenvironment_options.simulate_2D = false; 
 	}	
-	
-	
-/*
-	// all this is in XML as of August 2019 (1.6.0)
-	// no gradients need for this example 
 
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// set Dirichlet conditions 
-
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
-	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
-*/
-	
 	// initialize BioFVM 
-	
 	initialize_microenvironment(); 	
 	
 	return; 
@@ -226,6 +170,13 @@ void setup_tissue( void )
 	}
 
 	return; 
+}
+
+std::vector<std::string> my_coloring_function( Cell* pCell )
+{
+	// start with live dead coloring 
+	std::vector<std::string> output = false_cell_coloring_live_dead(pCell); 
+	return output; 
 }
 
 void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
@@ -255,76 +206,6 @@ void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
 	{
 		(*nodes)[tnf_maboss_index] = pCell->phenotype.molecular.internalized_total_substrates[tnf_substrate_index] > tnf_threshold;
 	}
-}
-
-//NOT USED
-std::vector<std::string> my_coloring_function( Cell* pCell )
-{
-	// start with flow cytometry coloring 
-	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
-	// if the cell is motile and not dead, paint it black 
-	if( pCell->phenotype.death.dead == false && 
-		pCell->type == 1 )
-	{
-		 output[0] = "black"; 
-		 output[2] = "black"; 	
-	}
-	
-	return output; 
-}
-
-std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
-{ 
-	// File pointer 
-	std::fstream fin; 
-	std::vector<init_record> result;
-
-	// Open an existing file 
-	fin.open(filename, std::ios::in); 
-
-	// Read the Data from the file 
-	// as String Vector 
-	std::vector<std::string> row; 
-	std::string line, word;
-
-	if(header)
-		getline(fin, line);
-
-	do 
-	{
-		row.clear(); 
-
-		// read an entire row and 
-		// store it in a string variable 'line' 
-		getline(fin, line);
-
-		// used for breaking words 
-		std::stringstream s(line); 
-
-		// read every column data of a row and 
-		// store it in a string variable, 'word' 
-		while (getline(s, word, delimiter)) { 
-
-			// add all the column data 
-			// of a row to a vector 
-			row.push_back(word); 
-		}
-
-		init_record record;
-		record.x = std::stof(row[2]);
-		record.y = std::stof(row[3]);
-		record.z = std::stof(row[4]);
-
-		result.push_back(record);
-	} while (!fin.eof());
-	
-	return result;
-}
-
-/* Go to proliferative if needed */
-void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	//do nothing as live model only have one phase
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
@@ -374,30 +255,56 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	}
 }
 
-void remove_density( int density_index )
-{	
-	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{
-		microenvironment.density_vector(n)[density_index] = 0; 	
-	}
-	std::cout << "Removal done" << std::endl;
-}
-
-double norm(double cent[3]){ 
-	return sqrt( cent[0]*cent[0] + cent[1]*cent[1] + cent[2]*cent[2] ); 
-}
-
-void inject_density(int density_index, double concentration) 
+/* Go to proliferative if needed */
+void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	//static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
-	double membrane_lenght = parameters.doubles("membrane_length");
-	// Inject given concentration on the extremities only
-	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{
-		//microenvironment.update_dirichlet_node(n, tnf_substrate_index, 0.5);
-		double cent[3] = {microenvironment.voxels(n).center[0], microenvironment.voxels(n).center[1], microenvironment.voxels(n).center[2]};
+	//do nothing as live model only have one phase
+}
 
-		if ( ! ((membrane_lenght - norm(cent)) > 0) )
-			microenvironment.density_vector(n)[density_index] = concentration; 	
-	}
+std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
+{ 
+	// File pointer 
+	std::fstream fin; 
+	std::vector<init_record> result;
+
+	// Open an existing file 
+	fin.open(filename, std::ios::in); 
+
+	// Read the Data from the file 
+	// as String Vector 
+	std::vector<std::string> row; 
+	std::string line, word;
+
+	if(header)
+		getline(fin, line);
+
+	do 
+	{
+		row.clear(); 
+
+		// read an entire row and 
+		// store it in a string variable 'line' 
+		getline(fin, line);
+
+		// used for breaking words 
+		std::stringstream s(line); 
+
+		// read every column data of a row and 
+		// store it in a string variable, 'word' 
+		while (getline(s, word, delimiter)) { 
+
+			// add all the column data 
+			// of a row to a vector 
+			row.push_back(word); 
+		}
+
+		init_record record;
+		record.x = std::stof(row[2]);
+		record.y = std::stof(row[3]);
+		record.z = std::stof(row[4]);
+
+		result.push_back(record);
+	} while (!fin.eof());
+	
+	return result;
 }

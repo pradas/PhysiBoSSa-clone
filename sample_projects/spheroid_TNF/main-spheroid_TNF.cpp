@@ -79,6 +79,7 @@
 // put custom code modules here! 
 
 #include "./custom_modules/custom.h" 
+#include "./custom_modules/custom_main.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -127,6 +128,7 @@ int main( int argc, char* argv[] )
 	double time_tnf_next = 0;
 	double time_remove_tnf = parameters.ints("time_remove_tnf");
 	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
+	double membrane_lenght = parameters.doubles("membrane_length");
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -150,7 +152,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = false_cell_coloring_live_dead;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -237,7 +239,7 @@ int main( int argc, char* argv[] )
 			{
 				int k = microenvironment.find_density_index("tnf");
 				if ( k >= 0 ) 
-					inject_density(k, concentration_tnf);
+					inject_density_sphere(k, concentration_tnf, membrane_lenght);
 			}
 			
 			PhysiCell_globals.current_time += diffusion_dt;

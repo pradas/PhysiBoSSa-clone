@@ -81,17 +81,7 @@ struct init_record
 	float z;
 };
 
-void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
-
-// any additional cell types (beyond cell_defaults)
-
-// custom cell phenotype functions could go here 
-void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt );
-
-void set_input_nodes(Cell* pCell, std::vector<bool> * nodes); 
-
 // setup functions to help us along 
-
 void create_cell_types( void );
 void setup_tissue( void ); 
 
@@ -99,14 +89,13 @@ void setup_tissue( void );
 void setup_microenvironment( void ); 
 
 // custom pathology coloring function 
-
 std::vector<std::string> my_coloring_function( Cell* );
 
-std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
+// custom cell phenotype functions could go here 
+void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt );
 
-void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
+void set_input_nodes(Cell* pCell, std::vector<bool> * nodes); 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
+void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
 
-void remove_density( int density_index );
-double norm(double cent[3]);
-void inject_density(int density_index, double concentration);
+std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
