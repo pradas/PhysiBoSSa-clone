@@ -117,7 +117,9 @@ void create_cell_types( void )
 
 	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = parameters.doubles("tnf_uptake_rate"); 
 	cell_defaults.phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
-	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 0.5; 
+	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 1; 
+
+	cell_defaults.phenotype.molecular.fraction_released_at_death[tnf_substrate_index] = 0.0;
 	
 	// add custom data here, if any 
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
