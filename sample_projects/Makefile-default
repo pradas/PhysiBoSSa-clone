@@ -136,7 +136,7 @@ beta-testing:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/beta_testing/config/* ./config/
 
-spheroid_TNF: 	
+spheroid-TNF: 	
 	cp ./sample_projects/spheroid_TNF/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/spheroid_TNF/main-spheroid_TNF.cpp ./main.cpp 
@@ -146,6 +146,17 @@ spheroid_TNF:
 	cp ./sample_projects/spheroid_TNF/config/* ./config/
 	mkdir ./scripts/
 	cp ./sample_projects/spheroid_TNF/scripts/* ./scripts/
+
+drug-AGS: 	
+	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/drug_AGS/main-drug_AGS.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/drug_AGS/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/drug_AGS/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/drug_AGS/scripts/* ./scripts/
 	
 # early examples for convergence testing 
 
