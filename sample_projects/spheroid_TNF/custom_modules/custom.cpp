@@ -90,7 +90,7 @@ void create_cell_types( void )
 	
 	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = live; 
+	cell_defaults.functions.cycle_model = Ki67_advanced;
 	
 	// set default_cell_functions; 
 	
@@ -103,21 +103,11 @@ void create_cell_types( void )
 
 	// set the rate terms in the default phenotype 
 	// first find index for a few key variables. 
-	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
-	// set live duration, apoptotic duration and rate and initially no necrosis 
-	int live_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::live);
-	cell_defaults.phenotype.cycle.data.transition_rate(live_index, live_index) = parameters.doubles("live_phase_duration");
-	
-	Cycle_Model* apoptosis_model = cell_defaults.phenotype.death.models[apoptosis_model_index];
-	int apoptotic_index = apoptosis_model->find_phase_index(PhysiCell_constants::apoptotic);
-	int debris_index = apoptosis_model->find_phase_index(PhysiCell_constants::debris);
-	apoptosis_model->transition_rate(apoptotic_index, debris_index) = parameters.doubles("apoptotic_duration");
-
-	cell_defaults.phenotype.death.rates[apoptosis_model_index] = parameters.doubles("apoptotic_rate"); 
+	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// set oxygen uptake / secretion parameters for the default cell type 
@@ -174,8 +164,8 @@ void setup_tissue( void )
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
-	// start with live dead coloring 
-	std::vector<std::string> output = false_cell_coloring_live_dead(pCell); 
+	// start with ki67 coloring 
+	std::vector<std::string> output = false_cell_coloring_Ki67(pCell); 
 	return output; 
 }
 
@@ -258,7 +248,12 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 /* Go to proliferative if needed */
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	//do nothing as live model only have one phase
+	// If cells is in G0 (quiescent)
+	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
+	{
+		// switch to pre-mitotic phase
+		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
+	}
 }
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
