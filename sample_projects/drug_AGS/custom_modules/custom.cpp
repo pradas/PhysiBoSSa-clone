@@ -145,18 +145,15 @@ void setup_tissue( void )
 
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
-	maboss = new MaBoSSNetwork(bnd_file, cfg_file);
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+	pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
 
 	pC = create_cell(); 
 	pC->assign_position( -100.0, 0.0, 1.0 );
-	maboss = new MaBoSSNetwork(bnd_file, cfg_file);
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+	pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
 	
 	pC = create_cell(); 
 	pC->assign_position( 0, 100.0, -7.0 );
-	maboss = new MaBoSSNetwork(bnd_file, cfg_file);
-	pC->maboss_cycle_network = new CellCycleNetwork(maboss);
+	pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
 
 	return; 
 }

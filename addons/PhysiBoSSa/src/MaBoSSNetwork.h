@@ -16,7 +16,6 @@
 
 class MaBoSSNetwork
 {
-
 	private:
 		/** \brief MaBoSS instances: network */
 		Network* network;
@@ -25,31 +24,20 @@ class MaBoSSNetwork
 		/** \brief MaBoSS instances: symbols list */
 		SymbolTable* symbTable;
 
-		/** \brief Name of input configuration file */
-		std::string conffile;
-
-		/** \brief Name of input configuration file */
-		std::string networkfile;
-
-		/** \brief Name of input configuration file */
-		std::string model_id;
-
 		/** \brief Time step to update the cycle */
 		double update_time;
 
 		/** \brief Names and indices of network nodes */
 		std::map< std::string, int > node_names;
-		
-		/** \brief List of special rate values in maboss network, usefull to simulate mutations
-		 *
-		 * Map key is the node name (first element) and cell line number (second element).
-		 * Map value is the corresponding rate value */
-		std::map< std::pair<std::string,int>, double> mbRates;
 
 		/** \brief Keep default value of nodes from CFG file */
 		std::vector<bool> def_nodes;
 
-	protected:
+		/** \brief Read and load nodes initial states */
+		void initNetworkState();
+		
+		/** \brief Load previous network states and inputs */
+		void load( NetworkState* netState, std::vector<bool>* inputs );
 
 	public:
 		/** \brief Constructor */
@@ -57,26 +45,16 @@ class MaBoSSNetwork
 		/** \brief Destructor */
 		~MaBoSSNetwork();
 
-		/** \brief Read and load nodes initial states */
-		void initNetworkState();
-
 		/** \brief return number of nodes */
 		inline int number_of_nodes()
 		{ return node_names.size(); };
 		
-		/** \brief Set values of nodes to default values */
-		void set_default( std::vector<bool>* nodes );
-		
-		/** \brief Print current state of all the nodes of the network */
-		void printNodes( NetworkState* netStates);
-
-		/** \brief If time to update network */
-		inline bool time_to_update( double elapsed_time )
-		{ return ( elapsed_time > update_time ); };
-
 		/** \brief Return update time value */
 		inline double update_time_step()
 		{ return update_time; };
+
+		/** \brief Set values of nodes to default values */
+		void set_default( std::vector<bool>* nodes );
 
 		/** \brief Run the current network
 		 *
@@ -85,8 +63,8 @@ class MaBoSSNetwork
 		 * */
 		void run(std::vector<bool>* nodes_val);
 		
-		/** \brief Load previous network states and inputs */
-		void load( NetworkState* netState, std::vector<bool>* inputs );
+		/** \brief Print current state of all the nodes of the network */
+		void printNodes( NetworkState* netStates);
 
 		/** \brief Return node of given name current value
 		 *

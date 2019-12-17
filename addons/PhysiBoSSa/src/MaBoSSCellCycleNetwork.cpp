@@ -1,8 +1,9 @@
 #include "MaBoSSCellCycleNetwork.h"
 
-CellCycleNetwork::CellCycleNetwork( MaBoSSNetwork* maboss )
+CellCycleNetwork::CellCycleNetwork(std::string bnd_file, std::string cfg_file)
 {
-	this->set_maboss( maboss );
+	MaBoSSNetwork* maboss = new MaBoSSNetwork(bnd_file, cfg_file); 
+	this->set_maboss(maboss);
 	this->time_to_update = ( 1 + 0.5*UniformRandom11() ) * maboss->update_time_step();
 }
 

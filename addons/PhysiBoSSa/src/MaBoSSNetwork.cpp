@@ -118,7 +118,3 @@ int MaBoSSNetwork::get_node_index( std::string name )
 		return res->second;
 	return -1;	
 }
-
-
-
-

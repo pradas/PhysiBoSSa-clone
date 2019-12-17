@@ -20,41 +20,36 @@
 class CellCycleNetwork
 {
 	private:
+		/** \brief MaBoss Network doing the job */
+		MaBoSSNetwork* maboss;
+		
+		/** \brief Vector of nodes state current value (0 or 1) */
+		std::vector<bool> nodes;
 
-			/** \brief MaBoss Network doing the job */
-			MaBoSSNetwork* maboss;
-			
-			/** \brief Vector of nodes state current value (0 or 1) */
-			std::vector<bool> nodes;
-
-			/** \brief time left before to update it again */
-			double time_to_update;
-
-	protected:
-
-	public:
-		/** \brief Constructor with given network instance */
-		CellCycleNetwork( MaBoSSNetwork* mboss);
-		/** \brief Class destructor */
-		~CellCycleNetwork();
-
-		inline std::vector<bool>* get_nodes() {return &nodes;}
-
-		inline MaBoSSNetwork* get_maboss() {return maboss;}
+		/** \brief time left before to update it again */
+		double time_to_update;
 
 		/** \brief Initialization: set network 
 		 *
 		 * @param mboss reference to the common object handling MaBoSS runs */
 		void set_maboss( MaBoSSNetwork* maboss );
-		
-		/** \brief Update MaboSS network states */
-		void run_maboss();
-		
+	
 		/** \brief choose a random update time, to asynchronize it between all cells 
 		 *
 		 * Set the next time at which to update the current cell's network. The time in between two udpates is chosen randomly in order to not update all cells together. */
 		void set_time_to_update();
 
+	public:
+		/** \brief Constructor with given network instance */
+		CellCycleNetwork(std::string bnd_file, std::string cfg_file);
+		/** \brief Class destructor */
+		~CellCycleNetwork();
+
+		inline std::vector<bool>* get_nodes() {return &nodes;}
+		inline MaBoSSNetwork* get_maboss() {return maboss;}
+		
+		/** \brief Update MaboSS network states */
+		void run_maboss();
 };
 
 #endif
