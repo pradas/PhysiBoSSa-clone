@@ -447,10 +447,8 @@ Cell* Cell::divide( )
 
 	std::string bnd_file = "./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd";
 	std::string cfg_file = "./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg";
-	MaBoSSNetwork* maboss = new MaBoSSNetwork(bnd_file, cfg_file);
-	child->maboss_cycle_network = new CellCycleNetwork(maboss);
+	child->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
 	
-
 	return child;
 }
 
