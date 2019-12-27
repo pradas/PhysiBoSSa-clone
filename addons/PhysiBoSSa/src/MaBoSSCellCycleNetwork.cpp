@@ -31,8 +31,9 @@ void CellCycleNetwork::set_time_to_update()
 }
 
 /* Update MaboSS network states */
-void CellCycleNetwork::run_maboss()
+double CellCycleNetwork::run_maboss()
 {
 	this->maboss->run(&this->nodes);
 	this->set_time_to_update();
+	return this->time_to_update;
 }

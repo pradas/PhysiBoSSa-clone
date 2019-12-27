@@ -121,7 +121,8 @@ void create_cell_types( void )
 
 	cell_defaults.phenotype.molecular.fraction_released_at_death[tnf_substrate_index] = 0.0;
 	
-	// add custom data here, if any 
+	// add custom data here, if any
+	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 0.0);
 	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
 
 	return; 
@@ -172,13 +173,14 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 
 void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 {
-    if(!phenotype.death.dead)
-    {
+	if (PhysiCell_globals.current_time > pCell->custom_data["next_physibossa_run"] && !phenotype.death.dead) 
+	{
 		std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
 		set_input_nodes(pCell, nodes);
 
-		pCell->maboss_cycle_network->run_maboss();
-
+		double next_run_in = pCell->maboss_cycle_network->run_maboss();
+		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
+		
 		from_nodes_to_cell(pCell, phenotype, dt);
 	}
 }

@@ -49,7 +49,7 @@ class CellCycleNetwork
 		inline int get_maboss_node_index( std::string name ) {return maboss->get_node_index(name);}
 
 		/** \brief Update MaboSS network states */
-		void run_maboss();
+		double run_maboss();
 };
 
 #endif
