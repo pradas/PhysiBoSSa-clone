@@ -178,8 +178,11 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 		std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
 		set_input_nodes(pCell, nodes);
 
-		double next_run_in = pCell->maboss_cycle_network->run_maboss();
-		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
+		#pragma omp critical
+		{
+			double next_run_in = pCell->maboss_cycle_network->run_maboss();
+			pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
+		}
 		
 		from_nodes_to_cell(pCell, phenotype, dt);
 	}
