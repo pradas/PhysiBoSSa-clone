@@ -64,7 +64,7 @@ class MaBoSSNetwork
 		void run(std::vector<bool>* nodes_val);
 		
 		/** \brief Print current state of all the nodes of the network */
-		void printNodes( NetworkState* netStates);
+		void print_nodes(std::vector<bool>* nodes_val);
 
 		/** \brief Return node of given name current value
 		 *

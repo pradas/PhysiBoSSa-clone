@@ -94,18 +94,19 @@ void MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 	for ( auto node: nodes )
 	{
 		(*nodes_val)[i] = netStates.getNodeState( node ) ;
-		//std::cout << node->getLabel() << " " << (*nodes_val)[i] << std::endl;
-		i ++;
+		i++;
 	}
 }
 
 /* Print current state of all the nodes of the network */
-void MaBoSSNetwork::printNodes(NetworkState* netStates)
+void MaBoSSNetwork::print_nodes(std::vector<bool>* nodes_val)
 {
+	int i = 0;
 	std::vector<Node*> nodes = network->getNodes();
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << netStates->getNodeState(node) << "; ";
+		std::cout << node->getLabel() << "=" << (*nodes_val)[i] << "; ";
+		i++;
 	}
 	std::cout << std::endl;
 }
