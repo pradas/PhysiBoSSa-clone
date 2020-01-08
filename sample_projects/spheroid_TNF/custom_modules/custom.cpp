@@ -195,9 +195,7 @@ void set_input_nodes(Cell* pCell) {
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
 	if (tnf_maboss_index != -1 && tnf_substrate_index != -1)
-	{
 		(*nodes)[tnf_maboss_index] = pCell->phenotype.molecular.internalized_total_substrates[tnf_substrate_index] > tnf_threshold;
-	}
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
@@ -237,12 +235,8 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	{
 		int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 		// produce some TNF
-		if ( (*nodes)[bn_index] )
-		{
-			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume;
-		}
-		else
-			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
+		pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 
+			(*nodes)[bn_index] ? (tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume) : 0;
 		pCell->set_internal_uptake_constants(dt);
 	}
 }
@@ -250,12 +244,9 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 /* Go to proliferative if needed */
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	// If cells is in G0 (quiescent)
+	// If cells is in G0 (quiescent) switch to pre-mitotic phase
 	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
-	{
-		// switch to pre-mitotic phase
 		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
-	}
 }
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
