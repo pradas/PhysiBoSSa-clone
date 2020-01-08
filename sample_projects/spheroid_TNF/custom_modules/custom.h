@@ -94,7 +94,7 @@ std::vector<std::string> my_coloring_function( Cell* );
 // custom cell phenotype functions could go here 
 void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt );
 
-void set_input_nodes(Cell* pCell, std::vector<bool> * nodes); 
+void set_input_nodes(Cell* pCell); 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
 

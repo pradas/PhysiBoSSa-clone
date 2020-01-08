@@ -175,8 +175,7 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 {
 	if (PhysiCell_globals.current_time > pCell->custom_data["next_physibossa_run"] && !phenotype.death.dead) 
 	{
-		std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
-		set_input_nodes(pCell, nodes);
+		set_input_nodes(pCell);
 
 		#pragma omp critical
 		{
@@ -188,7 +187,9 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 	}
 }
 
-void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
+void set_input_nodes(Cell* pCell) {
+	std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
+	
 	int tnf_maboss_index = pCell->maboss_cycle_network->get_maboss_node_index("TNF");
 	static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
