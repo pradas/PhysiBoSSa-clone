@@ -123,12 +123,12 @@ int main( int argc, char* argv[] )
 
 	bool end_time_tnf = false;
 	double time_add_tnf = parameters.ints("time_add_tnf");
-	double time_put_tnf = time_add_tnf;
+	double time_put_tnf = 0;
 	double duration_add_tnf = parameters.ints("duration_add_tnf");
 	double time_tnf_next = 0;
 	double time_remove_tnf = parameters.ints("time_remove_tnf");
 	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
-	double membrane_lenght = parameters.doubles("membrane_length");
+	double membrane_lenght = parameters.ints("membrane_length");
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	

@@ -80,9 +80,9 @@
 		<y_max>500</y_max>
 		<z_min>-500</z_min>
 		<z_max>500</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
+		<dx>15</dx>
+		<dy>15</dy>
+		<dz>15</dz>
 		<use_2D>false</use_2D>
 	</domain>
 	
