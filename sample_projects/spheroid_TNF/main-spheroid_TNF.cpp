@@ -95,7 +95,16 @@ int main( int argc, char* argv[] )
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
-	
+
+	// User parameters
+	double time_add_tnf = parameters.ints("time_add_tnf");
+	double time_put_tnf = 0;
+	double duration_add_tnf = parameters.ints("duration_add_tnf");
+	double time_tnf_next = 0;
+	double time_remove_tnf = parameters.ints("time_remove_tnf");
+	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
+	double membrane_lenght = parameters.ints("membrane_length");
+
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -108,6 +117,13 @@ int main( int argc, char* argv[] )
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
+
+	// do small diffusion steps alone to initialize densities
+	int k = microenvironment.find_density_index("tnf");
+	if ( k >= 0 ) 
+		inject_density_sphere(k, concentration_tnf, membrane_lenght);
+	for ( int i = 0; i < 25; i ++ )
+		microenvironment.simulate_diffusion_decay( 5*diffusion_dt );
 	
 	/* PhysiCell setup */ 
  	
@@ -120,15 +136,6 @@ int main( int argc, char* argv[] )
 	create_cell_types();
 	
 	setup_tissue();
-
-	bool end_time_tnf = false;
-	double time_add_tnf = parameters.ints("time_add_tnf");
-	double time_put_tnf = 0;
-	double duration_add_tnf = parameters.ints("duration_add_tnf");
-	double time_tnf_next = 0;
-	double time_remove_tnf = parameters.ints("time_remove_tnf");
-	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
-	double membrane_lenght = parameters.ints("membrane_length");
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -212,22 +219,16 @@ int main( int argc, char* argv[] )
 				}
 			}
 
-			// update the microenvironment
-			microenvironment.simulate_diffusion_decay( diffusion_dt );
-			
-			// run PhysiCell 
-			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
-			
 			/*
 			  Custom add-ons could potentially go here. 
 			*/			
-			if ( PhysiCell_globals.current_time > time_put_tnf )
+			if ( PhysiCell_globals.current_time >= time_put_tnf )
 			{
 				time_tnf_next = PhysiCell_globals.current_time + duration_add_tnf;
 				time_put_tnf += time_add_tnf;
 			}
 
-			if ( PhysiCell_globals.current_time > time_remove_tnf )
+			if ( PhysiCell_globals.current_time >= time_remove_tnf )
 			{
 				int k = microenvironment.find_density_index("tnf");
 				if ( k >= 0 )
@@ -235,12 +236,18 @@ int main( int argc, char* argv[] )
 				time_remove_tnf += PhysiCell_settings.max_time;
 			}
 
-			if ( PhysiCell_globals.current_time < time_tnf_next )
+			if ( PhysiCell_globals.current_time <= time_tnf_next )
 			{
 				int k = microenvironment.find_density_index("tnf");
 				if ( k >= 0 ) 
 					inject_density_sphere(k, concentration_tnf, membrane_lenght);
 			}
+				
+			// update the microenvironment
+			microenvironment.simulate_diffusion_decay( diffusion_dt );
+			
+			// run PhysiCell 
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
