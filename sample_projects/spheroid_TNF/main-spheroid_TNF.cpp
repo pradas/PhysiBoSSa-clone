@@ -96,15 +96,6 @@ int main( int argc, char* argv[] )
 	if( !XML_status )
 	{ exit(-1); }
 
-	// User parameters
-	double time_add_tnf = parameters.ints("time_add_tnf");
-	double time_put_tnf = 0;
-	double duration_add_tnf = parameters.ints("duration_add_tnf");
-	double time_tnf_next = 0;
-	double time_remove_tnf = parameters.ints("time_remove_tnf");
-	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
-	double membrane_lenght = parameters.ints("membrane_length");
-
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -118,6 +109,15 @@ int main( int argc, char* argv[] )
 	
 	setup_microenvironment(); // modify this in the custom code 
 
+	// User parameters
+	double time_add_tnf = parameters.ints("time_add_tnf");
+	double time_put_tnf = 0;
+	double duration_add_tnf = parameters.ints("duration_add_tnf");
+	double time_tnf_next = 0;
+	double time_remove_tnf = parameters.ints("time_remove_tnf");
+	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
+	double membrane_lenght = parameters.ints("membrane_length");
+	
 	// do small diffusion steps alone to initialize densities
 	int k = microenvironment.find_density_index("tnf");
 	if ( k >= 0 ) 

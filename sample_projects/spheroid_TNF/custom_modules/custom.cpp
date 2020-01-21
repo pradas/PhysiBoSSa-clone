@@ -150,13 +150,19 @@ void setup_tissue( void )
 	std::string cfg_file = parameters.strings("cfg_file");
 	for (int i = 0; i < cells.size(); i++)
 	{
-		int x = cells[i].x;
-		int y = cells[i].y;
-		int z = cells[i].z;
+		float x = cells[i].x;
+		float y = cells[i].y;
+		float z = cells[i].z;
+		float radius = cells[i].radius;
+		int phase = cells[i].phase;
+		double elapsed_time = cells[i].elapsed_time;
 
 		pC = create_cell(); 
 		pC->assign_position( x, y, z );
+		pC->phenotype.cycle.data.current_phase_index = phase;
+		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
+		pC->set_total_volume(sphere_volume_from_radius(radius));
 	}
 
 	return; 
@@ -288,6 +294,9 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 		record.x = std::stof(row[2]);
 		record.y = std::stof(row[3]);
 		record.z = std::stof(row[4]);
+		record.radius = std::stof(row[5]);
+		record.phase = std::stoi(row[13]);
+		record.elapsed_time = std::stod(row[14]);
 
 		result.push_back(record);
 	} while (!fin.eof());

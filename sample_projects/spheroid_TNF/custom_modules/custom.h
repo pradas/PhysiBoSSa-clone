@@ -79,6 +79,9 @@ struct init_record
 	float x;
 	float y;
 	float z;
+	float radius;
+	int phase;
+	double elapsed_time;
 };
 
 // setup functions to help us along 
@@ -99,3 +102,5 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
+
+inline float sphere_volume_from_radius(float radius) {return 4/3 * PhysiCell_constants::pi * std::pow(radius, 3);}
