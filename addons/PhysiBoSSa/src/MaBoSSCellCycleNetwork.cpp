@@ -4,7 +4,7 @@ CellCycleNetwork::CellCycleNetwork(std::string bnd_file, std::string cfg_file)
 {
 	MaBoSSNetwork* maboss = new MaBoSSNetwork(bnd_file, cfg_file); 
 	this->set_maboss(maboss);
-	this->time_to_update = ( 1 + 0.5*UniformRandom11() ) * maboss->update_time_step();
+	this->set_time_to_update();
 }
 
 CellCycleNetwork::~CellCycleNetwork()
@@ -31,9 +31,8 @@ void CellCycleNetwork::set_time_to_update()
 }
 
 /* Update MaboSS network states */
-double CellCycleNetwork::run_maboss()
+void CellCycleNetwork::run_maboss()
 {
 	this->maboss->run(&this->nodes);
 	this->set_time_to_update();
-	return this->time_to_update;
 }

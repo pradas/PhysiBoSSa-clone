@@ -46,11 +46,12 @@ class CellCycleNetwork
 		~CellCycleNetwork();
 
 		inline std::vector<bool>* get_nodes() {return &nodes;}
+		inline double get_time_to_update() {return time_to_update;}
 		inline int get_maboss_node_index( std::string name ) {return maboss->get_node_index(name);}
 		inline void print_nodes() {maboss->print_nodes(&nodes);}
 
 		/** \brief Update MaboSS network states */
-		double run_maboss();
+		void run_maboss();
 };
 
 #endif

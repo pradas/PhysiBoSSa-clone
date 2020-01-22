@@ -159,10 +159,13 @@ void setup_tissue( void )
 
 		pC = create_cell(); 
 		pC->assign_position( x, y, z );
+		pC->set_total_volume(sphere_volume_from_radius(radius));
+		
 		pC->phenotype.cycle.data.current_phase_index = phase;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
+		
 		pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
-		pC->set_total_volume(sphere_volume_from_radius(radius));
+		pC->custom_data["next_physibossa_run"] = pC->maboss_cycle_network->get_time_to_update();
 	}
 
 	return; 
@@ -183,7 +186,8 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 
 		#pragma omp critical
 		{
-			double next_run_in = pCell->maboss_cycle_network->run_maboss();
+			pCell->maboss_cycle_network->run_maboss();
+			double next_run_in = pCell->maboss_cycle_network->get_time_to_update();
 			pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		}
 		
