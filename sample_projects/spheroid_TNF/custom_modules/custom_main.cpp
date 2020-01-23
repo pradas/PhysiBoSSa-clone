@@ -3,6 +3,7 @@
 void inject_density_sphere(int density_index, double concentration, double membrane_lenght) 
 {
 	// Inject given concentration on the extremities only
+	#pragma omp parallel for
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
 		auto current_voxel = microenvironment.voxels(n);
